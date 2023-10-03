@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Abalone</title>
+        <link rel="stylesheet" href="main.css">
+        <meta encoding="'utf-8"></head>
+    </head>
+    <body>
+        <div id = "pop_up_container">
+            <div id="pop_up">
+                <span id="close_pop_up">&#10006;</span>
+                <h2 id="pop_up_title">Fin de partie</h2>
+                <p id="pop_up_text"><span class="winner_indicator W"></span></p>
+            
+        </div>
+    </div>
+        <div id="error">Erreur : Action non permise</div>
+        <div id="canvas" width="100%" height="100%"></div>
+        <div id="white_score"></div>
+        <div id="black_score"></div>
+        <div id = "buttons">
+            <button id ="previous">Previous</button>
+            <button id ="next">Next</button>
+            <button id ="play">Play</button>
+            <input type="range" min="1" max="1000" value="1000" id="time">
+            <button id ="stop">Stop</button>
+            <button id ="reset">Reset</button>
+            
+            <input id="hostname" type="text" value="localhost"/>
+            <input id="port" type="text" value="16001" style="width:55px"/>
+            <button id="connect" >Connect</button>
+            <span id="status" style="color:red">
+                Disconnected
+            </span>
+            <p id="steps"></p>
+            </div>
+        
+        </div>
+        <a style="color:black;opacity:.2;font-size:9px" target="_blank" href="https://bit.ly/3OMRanU">Conditions d'utilisations</a>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+        
+</html>
