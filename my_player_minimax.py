@@ -3,6 +3,7 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 import math
 from typing import Dict
+from utils import compute_score
 
 
 class GameTree:
@@ -21,7 +22,8 @@ class GameTree:
         self.max_player.extended_nodes += 1
 
         if self.state.is_done():
-            self.value = self.compute_score(self.state.get_scores())
+            self.value = compute_score(
+                self.state, self.max_player, self.state.get_scores())
             return self.value
 
         if self.state.next_player == self.max_player:
