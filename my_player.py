@@ -2,8 +2,7 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 import math
-from typing import Dict, List
-from seahorse.player.player import Player
+from typing import Dict
 
 
 class GameTree:
@@ -25,13 +24,13 @@ class GameTree:
 
         if self.state.next_player == self.max_player:
             self.value = -math.inf
-            for child in self.get_children():
+            for child in self.get_children().values():
                 self.value = max(self.value, child.get_value())
             return self.value
 
         if self.state.next_player == self.min_player:
             self.value = math.inf
-            for child in self.get_children():
+            for child in self.get_children().values():
                 self.value = min(self.value, child.get_value())
             return self.value
 
@@ -39,12 +38,10 @@ class GameTree:
         if self.children is not None:
             return self.children
 
-        self.children = []
+        self.children = {}
         for action in self.state.get_possible_actions():
-            self.children.append(
-                GameTree(self.max_player, self.min_player,
-                         action.get_next_game_state(), action)
-            )
+            self.children[action.get_next_game_state().rep] = GameTree(self.max_player, self.min_player,
+                                                                       action.get_next_game_state(), action)
         return self.children
 
     def __str__(self):
@@ -53,7 +50,7 @@ class GameTree:
     def get_str(self, depth):
         label = "MAX" if self.state.next_player == self.max_player else "MIN"
         string = "-" * depth + f"{label} {self.get_value()}\n"
-        for child in self.get_children():
+        for child in self.get_children().values():
             string += child.get_str(depth + 1)
         return string
 
@@ -146,11 +143,8 @@ class MyPlayer(PlayerAbalone):
         # rep = current_state.get_rep() # can be used as in dict
         # print(current_state.is_done())
         if current_state.rep != self.game_tree.state.rep:
-            for child in self.game_tree.get_children():
-                if child.state.rep == current_state.rep:
-                    self.game_tree = child
-                    break
-        next_state = max(self.game_tree.get_children(),
+            self.game_tree = self.game_tree.get_children()[current_state.rep]
+        next_state = max(self.game_tree.get_children().values(),
                          key=lambda x: x.get_value())
         print(f"value next state: {next_state.get_value()}")
         chosen_action = next_state.action
