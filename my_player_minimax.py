@@ -7,14 +7,12 @@ from typing import Dict
 
 class GameTree:
     def __init__(self, max_player, min_player, state, action=None):
-        self.max_player = max_player
         self.min_player = min_player
+        self.max_player = max_player
         self.state = state
         self.action = action
         self.value = None
         self.children = None
-        self.alpha = -math.inf
-        self.beta = math.inf
 
     def get_value(self):
         if self.value is not None:
@@ -29,21 +27,13 @@ class GameTree:
         if self.state.next_player == self.max_player:
             self.value = -math.inf
             for child in self.get_children().values():
-                child.alpha = self.alpha
-                child.beta = self.beta
                 self.value = max(self.value, child.get_value())
-                self.alpha = max(self.alpha, self.value)
-                if self.alpha >= self.beta:
-                    break
             return self.value
 
         if self.state.next_player == self.min_player:
             self.value = math.inf
             for child in self.get_children().values():
                 self.value = min(self.value, child.get_value())
-                self.beta = min(self.beta, self.value)
-                if self.alpha >= self.beta:
-                    break
             return self.value
 
     def get_children(self):
@@ -150,7 +140,6 @@ class MyPlayer(PlayerAbalone):
                              else players[0])
             self.game_tree = GameTree(
                 self, self.opponent, current_state)
-            # print(self.game_tree)
         # TODO store children in dict with rep keys
         # rep = current_state.get_rep() # can be used as in dict
         # print(current_state.is_done())
@@ -160,6 +149,6 @@ class MyPlayer(PlayerAbalone):
                          key=lambda x: x.get_value())
         chosen_action = next_state.action
         self.game_tree = next_state
-        # print(choice.get_next_game_state().is_done())
         print(self.extended_nodes)
+        # print(choice.get_next_game_state().is_done())
         return chosen_action
