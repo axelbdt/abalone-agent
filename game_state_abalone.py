@@ -24,8 +24,8 @@ class GameStateAbalone(GameState):
 
     def __init__(self, scores: Dict, next_player: Player, players: List[Player], rep: BoardAbalone, step: int, *args, **kwargs) -> None:
         super().__init__(scores, next_player, players, rep)
-        self.max_score = -6
-        self.max_step = 50
+        self.max_score = -3  # -6
+        self.max_step = 3  # 50
         self.step = step
 
     def get_step(self) -> int:
@@ -49,7 +49,7 @@ class GameStateAbalone(GameState):
         else:
             return False
 
-    def get_neighbours(self, i: int, j: int) -> Dict[str,Tuple[str,Tuple[int,int]]]:
+    def get_neighbours(self, i: int, j: int) -> Dict[str, Tuple[str, Tuple[int, int]]]:
         return self.get_rep().get_neighbours(i, j)
 
     def detect_conflict(self, i: int, j: int, n_i: int, n_j: int) -> List[Tuple[int, int]]:
@@ -132,7 +132,8 @@ class GameStateAbalone(GameState):
         for i, j in list(b.keys()):
             p = b.get((i, j), None)
             if p.get_owner_id() == self.next_player.get_id():
-                list_index = [(-1, -1), (1, -1), (-1, 1), (1, 1), (2, 0), (-2, 0)]
+                list_index = [(-1, -1), (1, -1), (-1, 1),
+                              (1, 1), (2, 0), (-2, 0)]
                 for n_i, n_j in list_index:
                     to_move_pieces = self.detect_conflict(i, j, n_i, n_j)
                     if to_move_pieces is not None:
@@ -149,21 +150,26 @@ class GameStateAbalone(GameState):
                                 and self.in_hexa((n_index[0] + n_i, n_index[1] + n_j))
                             ):
                                 copy_b[(n_index[0] + n_i, n_index[1] + n_j, 1)] = Piece(
-                                    piece_type=copy_b[(n_index[0], n_index[1])].get_type(),
-                                    owner=self.get_player_id(copy_b[(n_index[0], n_index[1])].get_owner_id()),
+                                    piece_type=copy_b[(
+                                        n_index[0], n_index[1])].get_type(),
+                                    owner=self.get_player_id(
+                                        copy_b[(n_index[0], n_index[1])].get_owner_id()),
                                 )
                                 copy_b.pop((n_index[0], n_index[1]))
                             else:
-                                id_add = copy_b[(n_index[0], n_index[1])].get_owner_id()
+                                id_add = copy_b[(
+                                    n_index[0], n_index[1])].get_owner_id()
                                 pop_piece = (n_index[0], n_index[1])
                                 copy_b.pop((n_index[0], n_index[1]))
                         for k in range(len(to_move_pieces)):
                             n_index = to_move_pieces[k]
                             if pop_piece != (n_index[0], n_index[1]):
                                 copy_b[(n_index[0] + n_i, n_index[1] + n_j)] = copy.copy(
-                                    copy_b[(n_index[0] + n_i, n_index[1] + n_j, 1)]
+                                    copy_b[(n_index[0] + n_i,
+                                            n_index[1] + n_j, 1)]
                                 )
-                                copy_b.pop((n_index[0] + n_i, n_index[1] + n_j, 1))
+                                copy_b.pop(
+                                    (n_index[0] + n_i, n_index[1] + n_j, 1))
                         yield BoardAbalone(env=copy_b, dim=d), id_add
 
     def generate_possible_actions(self) -> Set[Action]:
@@ -188,13 +194,14 @@ class GameStateAbalone(GameState):
         }
         return poss_actions
 
-    def convert_light_action_to_action(self,data) ->  Action :
-        src,dst=data["from"],data["to"]
+    def convert_light_action_to_action(self, data) -> Action:
+        src, dst = data["from"], data["to"]
         current_game_state = self
         b = current_game_state.get_rep().get_env()
         d = current_game_state.get_rep().get_dimensions()
-        n_i, n_j = dst[0]-src[0],dst[1]-src[1]
-        to_move_pieces = current_game_state.detect_conflict(src[0],src[1],n_i,n_j)
+        n_i, n_j = dst[0]-src[0], dst[1]-src[1]
+        to_move_pieces = current_game_state.detect_conflict(
+            src[0], src[1], n_i, n_j)
         if to_move_pieces is not None:
             copy_b = copy.copy(b)
             id_add = None
@@ -210,7 +217,8 @@ class GameStateAbalone(GameState):
                 ):
                     copy_b[(n_index[0] + n_i, n_index[1] + n_j, 1)] = Piece(
                         piece_type=copy_b[(n_index[0], n_index[1])].get_type(),
-                        owner=current_game_state.get_player_id(copy_b[(n_index[0], n_index[1])].get_owner_id()),
+                        owner=current_game_state.get_player_id(
+                            copy_b[(n_index[0], n_index[1])].get_owner_id()),
                     )
                     copy_b.pop((n_index[0], n_index[1]))
                 else:
@@ -225,15 +233,15 @@ class GameStateAbalone(GameState):
                     )
                     copy_b.pop((n_index[0] + n_i, n_index[1] + n_j, 1))
             return Action(
-                    current_game_state,
-                    GameStateAbalone(
-                        current_game_state.compute_scores(id_add=id_add),
-                        current_game_state.compute_next_player(),
-                        current_game_state.players,
-                        BoardAbalone(env=copy_b, dim=d),
-                        step=current_game_state.step + 1,
-                        ),
-                    )
+                current_game_state,
+                GameStateAbalone(
+                    current_game_state.compute_scores(id_add=id_add),
+                    current_game_state.compute_next_player(),
+                    current_game_state.players,
+                    BoardAbalone(env=copy_b, dim=d),
+                    step=current_game_state.step + 1,
+                ),
+            )
         return None
 
     def compute_scores(self, id_add: int) -> Dict[int, float]:
@@ -259,10 +267,9 @@ class GameStateAbalone(GameState):
         return "The game is finished!"
 
     def to_json(self) -> str:
-        return { i:j for i,j in self.__dict__.items() if i!="_possible_actions"}
+        return {i: j for i, j in self.__dict__.items() if i != "_possible_actions"}
 
     @classmethod
-    def from_json(cls,data:str,*,next_player:Optional[PlayerAbalone]=None) -> Serializable:
+    def from_json(cls, data: str, *, next_player: Optional[PlayerAbalone] = None) -> Serializable:
         d = json.loads(data)
-        return cls(**{**d,"scores":{int(k):v for k,v in d["scores"].items()},"players":[PlayerAbalone.from_json(json.dumps(x)) if not isinstance(x,str) else next_player for x in d["players"]],"next_player":next_player,"rep":BoardAbalone.from_json(json.dumps(d["rep"]))})
-
+        return cls(**{**d, "scores": {int(k): v for k, v in d["scores"].items()}, "players": [PlayerAbalone.from_json(json.dumps(x)) if not isinstance(x, str) else next_player for x in d["players"]], "next_player": next_player, "rep": BoardAbalone.from_json(json.dumps(d["rep"]))})
