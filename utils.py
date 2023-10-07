@@ -38,6 +38,10 @@ def compute_score(state, max_player, scores: Dict[int, float]) -> int:
 
 
 def compute_distance_to_center(state, players_id):
+    """
+    compute the distance to center for each player
+    return a dict with player_id as key and distance as value
+    """
     final_rep = state.get_rep()
     env = final_rep.get_env()
     dim = final_rep.get_dimensions()
@@ -48,3 +52,13 @@ def compute_distance_to_center(state, players_id):
         if p.get_owner_id():
             dist[p.get_owner_id()] += manhattanDist(center, (i, j))
     return dist
+
+
+def distance_to_center(state, player_ids, player_id):
+    """
+    distance to center for the player with player_id
+    takes player_ids as argument probably bc bad design
+    TODO: fix the need for player_ids
+    """
+    dist = compute_distance_to_center(state, player_ids)
+    return dist[player_id]
