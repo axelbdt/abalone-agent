@@ -1,6 +1,22 @@
-minimax : time left : 550.2085106372833
+minimax
+max_step : 5
+time left : 550.2085106372833
 nodes : 1861133
 
 ab pruning 
+max_step : 5
 time left: 830.5963799953461
 nodes: 336129
+
+max_step : 4
+time left: 891.2298052310944
+nodes: 24655
+
+ab pruning sorted with distance to center
+max_step : 4
+time left: 890.8312456607819
+nodes: 17775
+
+max_step : 5
+time : 833.6672351360321
+nodes: 230794

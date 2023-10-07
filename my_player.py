@@ -2,7 +2,7 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 import math
-from utils import compute_score
+from utils import compute_score, compute_distance_to_center
 
 
 class GameTree:
@@ -22,14 +22,23 @@ class GameTree:
 
         self.max_player.extended_nodes += 1
 
+        # terminal node
         if self.state.is_done():
             self.value = compute_score(
                 self.state, self.max_player, self.state.get_scores())
             return self.value
 
+        # MAX player
         if self.state.next_player == self.max_player:
             self.value = -math.inf
-            for child in self.get_children().values():
+
+            # order children by distance to center
+            children_list = self.get_children().values()
+            ordered_children = sorted(
+                children_list,
+                key=lambda x: x.distance_to_center(self.max_player.get_id()))
+
+            for child in ordered_children:
                 child.alpha = self.alpha
                 child.beta = self.beta
                 self.value = max(self.value, child.get_value())
@@ -38,9 +47,17 @@ class GameTree:
                     break
             return self.value
 
+        # MIN player
         if self.state.next_player == self.min_player:
             self.value = math.inf
-            for child in self.get_children().values():
+
+            # order children by distance to center
+            children_list = self.get_children().values()
+            ordered_children = sorted(
+                children_list,
+                key=lambda x: x.distance_to_center(self.min_player.get_id()))
+
+            for child in ordered_children:
                 self.value = min(self.value, child.get_value())
                 self.beta = min(self.beta, self.value)
                 if self.alpha >= self.beta:
@@ -53,8 +70,9 @@ class GameTree:
 
         self.children = {}
         for action in self.state.get_possible_actions():
-            self.children[action.get_next_game_state().rep] = GameTree(self.max_player, self.min_player,
-                                                                       action.get_next_game_state(), action)
+            rep = action.get_next_game_state().rep
+            self.children[rep] = GameTree(self.max_player, self.min_player,
+                                          action.get_next_game_state(), action)
         return self.children
 
     def __str__(self):
@@ -69,6 +87,12 @@ class GameTree:
 
     def to_json(self):
         return {}
+
+    def distance_to_center(self, player_id):
+        dist = compute_distance_to_center(self.state,
+                                          [self.max_player.get_id(),
+                                           self.min_player.get_id()])
+        return dist[player_id]
 
 
 class MyPlayer(PlayerAbalone):
@@ -103,22 +127,25 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
+        # compute the tree on first run
         if self.game_tree is None:
             players = current_state.get_players()
             self.opponent = (players[1] if players[0] == self
                              else players[0])
             self.game_tree = GameTree(
                 self, self.opponent, current_state)
-            # print(self.game_tree)
-        # TODO store children in dict with rep keys
-        # rep = current_state.get_rep() # can be used as in dict
-        # print(current_state.is_done())
+
+        # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree.state.rep:
             self.game_tree = self.game_tree.get_children()[current_state.rep]
+
+        # compute the next state and action
         next_state = max(self.game_tree.get_children().values(),
                          key=lambda x: x.get_value())
         chosen_action = next_state.action
+
+        # use the next state as the root of the tree
         self.game_tree = next_state
-        # print(choice.get_next_game_state().is_done())
+
         print(self.extended_nodes)
         return chosen_action
