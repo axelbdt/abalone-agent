@@ -6,7 +6,7 @@ class GameTree:
         self.min_player = min_player
         self.state = state
         self.action = action
-        self.value = None
+        self.score = None
         self.children = None
 
     def get_children(self):
@@ -20,7 +20,7 @@ class GameTree:
                                                 action.get_next_game_state(), action)
         return self.children
 
-    def get_value(self):
+    def get_score(self):
         raise NotImplementedError
 
     def __str__(self):
@@ -28,7 +28,7 @@ class GameTree:
 
     def get_str(self, depth):
         label = "MAX" if self.state.next_player == self.max_player else "MIN"
-        string = "-" * depth + f"{label} {self.value}\n"
+        string = "-" * depth + f"{label} {self.score}\n"
         if self.children is not None:
             for child in self.children.values():
                 string += child.get_str(depth + 1)

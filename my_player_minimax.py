@@ -48,7 +48,7 @@ class MyPlayer(PlayerAbalone):
         if current_state.rep != self.game_tree.state.rep:
             self.game_tree = self.game_tree.get_children()[current_state.rep]
         next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.get_value())
+                         key=lambda x: x.get_score())
         chosen_action = next_state.action
         self.game_tree = next_state
         return chosen_action

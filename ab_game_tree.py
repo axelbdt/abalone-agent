@@ -14,33 +14,35 @@ class ABGameTree(GameTree):
         self.alpha = -math.inf
         self.beta = math.inf
 
-    def get_value(self):
-        if self.value is not None:
-            return self.value
+    def get_score(self):
+        if self.score is not None:
+            return self.score
 
         self.max_player.extended_nodes += 1
 
         if self.state.is_done():
-            self.value = compute_score(
+            self.score = compute_score(
                 self.state, self.max_player, self.state.get_scores())
-            return self.value
+            return self.score
 
         if self.state.next_player == self.max_player:
-            self.value = -math.inf
+            self.score = -math.inf
             for child in self.get_children().values():
                 child.alpha = self.alpha
                 child.beta = self.beta
-                self.value = max(self.value, child.get_value())
-                self.alpha = max(self.alpha, self.value)
+                self.score = max(self.score, child.get_score())
+                self.alpha = max(self.alpha, self.score)
                 if self.alpha >= self.beta:
                     break
-            return self.value
+            return self.score
 
         if self.state.next_player == self.min_player:
-            self.value = math.inf
+            self.score = math.inf
             for child in self.get_children().values():
-                self.value = min(self.value, child.get_value())
-                self.beta = min(self.beta, self.value)
+                child.alpha = self.alpha
+                child.beta = self.beta
+                self.score = min(self.score, child.get_score())
+                self.beta = min(self.beta, self.score)
                 if self.alpha >= self.beta:
                     break
-            return self.value
+            return self.score

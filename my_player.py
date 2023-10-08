@@ -50,7 +50,7 @@ class MyPlayer(PlayerAbalone):
 
         # compute the next state and action
         next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.get_value())
+                         key=lambda x: x.get_score())
         chosen_action = next_state.action
 
         # use the next state as the root of the tree
