@@ -45,10 +45,12 @@ class MyPlayer(PlayerAbalone):
                              else players[0])
             self.game_tree = MinimaxGameTree(
                 self, self.opponent, current_state)
+            self.game_tree.expand()
+            self.game_tree.compute_score()
         if current_state.rep != self.game_tree.state.rep:
             self.game_tree = self.game_tree.get_children()[current_state.rep]
         next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.get_score())
+                         key=lambda x: x.score)
         chosen_action = next_state.action
         self.game_tree = next_state
         return chosen_action
