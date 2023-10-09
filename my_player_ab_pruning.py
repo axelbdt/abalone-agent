@@ -1,7 +1,9 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from ab_game_tree import ABGameTree
+from ab_game_tree import create_game_tree, compute_score
+from keys import STATE, ACTION, SCORE, CHILDREN
+from math import inf
 
 
 class MyPlayer(PlayerAbalone):
@@ -40,14 +42,14 @@ class MyPlayer(PlayerAbalone):
             players = current_state.get_players()
             self.opponent = (players[1] if players[0] == self
                              else players[0])
-            self.game_tree = ABGameTree(
-                self, self.opponent, current_state)
-        if current_state.rep != self.game_tree.state.rep:
-            self.game_tree = self.game_tree.get_children()[current_state.rep]
-        next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.get_value())
-        chosen_action = next_state.action
-        self.game_tree = next_state
+            self.game_tree = create_game_tree(current_state)
+            compute_score(self.game_tree, self, self.opponent)
+        if current_state.rep != self.game_tree[STATE].rep:
+            self.game_tree = self.game_tree[CHILDREN][current_state.rep]
+        next_node = max(self.game_tree[CHILDREN].values(),
+                        key=lambda x: x[SCORE] or -inf)
+        chosen_action = next_node[ACTION]
+        self.game_tree = next_node
         return chosen_action
 
     def to_json(self):

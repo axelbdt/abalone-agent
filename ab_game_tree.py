@@ -1,48 +1,77 @@
 
 import math
 from utils import compute_state_score
-from game_tree import GameTree
+from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA
 
 
-class ABGameTree(GameTree):
+def create_game_tree(state, action=None):
+    return {
+        STATE: state,
+        ACTION: action,
+        SCORE: None,
+        CHILDREN: None,
+        ALPHA: -math.inf,
+        BETA: math.inf
+    }
+
+
+def expand(game_tree):
     """
-    Game tree class for minimax with alpha-beta pruning.
+    Expands the game tree by creating children nodes,
+    will only go one level deep
     """
+    if game_tree[CHILDREN] is not None:
+        return game_tree
 
-    def __init__(self, max_player, min_player, state, action=None):
-        super().__init__(max_player, min_player, state, action)
-        self.alpha = -math.inf
-        self.beta = math.inf
+    game_tree[CHILDREN] = {
+        action.get_next_game_state().rep:
+        create_game_tree(action.get_next_game_state(), action)
+        for action in game_tree[STATE].get_possible_actions()
+    }
 
-    def get_score(self):
-        if self.score is not None:
-            return self.score
+    return game_tree
 
-        self.max_player.extended_nodes += 1
 
-        if self.state.is_done():
-            self.score = compute_state_score(
-                self.state, self.max_player, self.state.get_scores())
-            return self.score
+def compute_score(game_tree, max_player, min_player):
+    """
+    Computes the score of the game tree by expanding it completely
+    and then computing the score of each node from the bottom up
+    using the minimax algorithm with alpha-beta pruning
+    pruned nodes will have their score set to None
+    """
+    expand(game_tree)
+    if game_tree[SCORE] is not None:
+        return game_tree[SCORE]
 
-        if self.state.next_player == self.max_player:
-            self.score = -math.inf
-            for child in self.get_children().values():
-                child.alpha = self.alpha
-                child.beta = self.beta
-                self.score = max(self.score, child.get_score())
-                self.alpha = max(self.alpha, self.score)
-                if self.alpha >= self.beta:
-                    break
-            return self.score
+    if game_tree[STATE].is_done():
+        game_tree[SCORE] = compute_state_score(
+            game_tree[STATE],
+            max_player,
+            game_tree[STATE].scores)
+        return game_tree[SCORE]
 
-        if self.state.next_player == self.min_player:
-            self.score = math.inf
-            for child in self.get_children().values():
-                child.alpha = self.alpha
-                child.beta = self.beta
-                self.score = min(self.score, child.get_score())
-                self.beta = min(self.beta, self.score)
-                if self.alpha >= self.beta:
-                    break
-            return self.score
+    if game_tree[STATE].next_player == max_player:
+        game_tree[SCORE] = -math.inf
+        for child in game_tree[CHILDREN].values():
+            # propagate alpha and beta values to child
+            child[ALPHA] = game_tree[ALPHA]
+            child[BETA] = game_tree[BETA]
+            compute_score(child, max_player, min_player)
+            game_tree[SCORE] = max(game_tree[SCORE], child[SCORE])
+            game_tree[ALPHA] = max(game_tree[ALPHA], game_tree[SCORE])
+            if game_tree[ALPHA] >= game_tree[BETA]:
+                break
+        return
+
+    if game_tree[STATE].next_player == min_player:
+        game_tree[SCORE] = math.inf
+        for child in game_tree[CHILDREN].values():
+            # propagate alpha and beta values to child
+            child[ALPHA] = game_tree[ALPHA]
+            child[BETA] = game_tree[BETA]
+            compute_score(child, max_player, min_player)
+            game_tree[SCORE] = min(game_tree[SCORE], child[SCORE])
+            game_tree[BETA] = min(game_tree[BETA], game_tree[SCORE])
+            if game_tree[ALPHA] >= game_tree[BETA]:
+                break
+        return
