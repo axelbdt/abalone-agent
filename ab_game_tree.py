@@ -1,6 +1,6 @@
 
 import math
-from utils import compute_score
+from utils import compute_state_score
 from game_tree import GameTree
 
 
@@ -21,7 +21,7 @@ class ABGameTree(GameTree):
         self.max_player.extended_nodes += 1
 
         if self.state.is_done():
-            self.score = compute_score(
+            self.score = compute_state_score(
                 self.state, self.max_player, self.state.get_scores())
             return self.score
 

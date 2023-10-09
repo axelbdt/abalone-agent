@@ -6,7 +6,7 @@ def manhattanDist(A, B):
     return dist
 
 
-def compute_score(state, max_player, scores: Dict[int, float]) -> int:
+def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
     """
     Computes the winners of the game based on the scores.
 

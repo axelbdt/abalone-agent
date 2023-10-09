@@ -1,7 +1,8 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from minimax_game_tree import MinimaxGameTree
+from minimax_game_tree import create_game_tree, expand, compute_score
+from keys import MAX_PLAYER, MIN_PLAYER, STATE, ACTION, SCORE, CHILDREN
 
 
 class MyPlayer(PlayerAbalone):
@@ -43,14 +44,14 @@ class MyPlayer(PlayerAbalone):
             players = current_state.get_players()
             self.opponent = (players[1] if players[0] == self
                              else players[0])
-            self.game_tree = MinimaxGameTree(
+            self.game_tree = create_game_tree(
                 self, self.opponent, current_state)
-            self.game_tree.expand()
-            self.game_tree.compute_score()
-        if current_state.rep != self.game_tree.state.rep:
-            self.game_tree = self.game_tree.get_children()[current_state.rep]
-        next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.score)
-        chosen_action = next_state.action
+            expand(self.game_tree)
+            compute_score(self.game_tree)
+        if current_state.rep != self.game_tree[STATE].rep:
+            self.game_tree = self.game_tree[CHILDREN][current_state.rep]
+        next_state = max(self.game_tree[CHILDREN].values(),
+                         key=lambda x: x[SCORE])
+        chosen_action = next_state[ACTION]
         self.game_tree = next_state
         return chosen_action

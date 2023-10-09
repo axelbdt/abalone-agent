@@ -9,20 +9,6 @@ class GameTree:
         self.score = None
         self.children = None
 
-    def get_children(self):
-        if self.children is not None:
-            return self.children
-
-        self.children = {}
-        for action in self.state.get_possible_actions():
-            rep = action.get_next_game_state().rep
-            self.children[rep] = self.__class__(self.max_player, self.min_player,
-                                                action.get_next_game_state(), action)
-        return self.children
-
-    def get_score(self):
-        raise NotImplementedError
-
     def __str__(self):
         return self.get_str(0)
 
