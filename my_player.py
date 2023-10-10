@@ -1,7 +1,9 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from sorted_ab_game_tree import SortedABGameTree
+from sorted_ab_game_tree import create_game_tree, compute_score, expand
+from keys import SCORE, STATE, CHILDREN, ACTION
+from math import inf
 
 
 class MyPlayer(PlayerAbalone):
@@ -41,20 +43,25 @@ class MyPlayer(PlayerAbalone):
             players = current_state.get_players()
             self.opponent = (players[1] if players[0] == self
                              else players[0])
-            self.game_tree = SortedABGameTree(
-                self, self.opponent, current_state)
+            self.game_tree = create_game_tree(current_state)
+            compute_score(self.game_tree, self, self.opponent)
 
         # retrieve the current state in the tree after the opponent's move
-        if current_state.rep != self.game_tree.state.rep:
-            self.game_tree = self.game_tree.get_children()[current_state.rep]
+        if current_state.rep != self.game_tree[STATE].rep:
+            self.game_tree = self.game_tree[CHILDREN][current_state.rep]
+            expand(self.game_tree)
+            compute_score(self.game_tree, self, self.opponent)
 
         # compute the next state and action
-        next_state = max(self.game_tree.get_children().values(),
-                         key=lambda x: x.get_score())
-        chosen_action = next_state.action
+        next_node = max(self.game_tree[CHILDREN].values(),
+                        key=lambda x: x[SCORE] or -inf)
+        chosen_action = next_node[ACTION]
 
         # use the next state as the root of the tree
-        self.game_tree = next_state
+        self.game_tree = next_node
 
         print(self.extended_nodes)
         return chosen_action
+
+    def to_json(self) -> dict:
+        return {}

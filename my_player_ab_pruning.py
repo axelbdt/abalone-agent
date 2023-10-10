@@ -1,7 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from ab_game_tree import create_game_tree, compute_score
+from ab_game_tree import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN
 from math import inf
 
@@ -46,6 +46,8 @@ class MyPlayer(PlayerAbalone):
             compute_score(self.game_tree, self, self.opponent)
         if current_state.rep != self.game_tree[STATE].rep:
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
+            expand(self.game_tree)
+            compute_score(self.game_tree, self, self.opponent)
         next_node = max(self.game_tree[CHILDREN].values(),
                         key=lambda x: x[SCORE] or -inf)
         chosen_action = next_node[ACTION]
