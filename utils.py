@@ -22,7 +22,7 @@ def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
     itera = list(filter(lambda x: x.get_id()
                  in players_id, state.get_players()))
     if len(itera) > 1:  # égalité
-        dist = compute_distance_to_center(state, players_id)
+        dist = compute_distances_to_center(state)
         min_dist = min(dist.values())
         players_id = list(filter(lambda key: dist[key] == min_dist, dist))
         itera = list(filter(lambda x: x.get_id()
@@ -38,11 +38,12 @@ def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
             return -inf
 
 
-def compute_distance_to_center(state, players_id):
+def compute_distances_to_center(state):
     """
     compute the distance to center for each player
     return a dict with player_id as key and distance as value
     """
+    players_id = [player.get_id() for player in state.get_players()]
     final_rep = state.get_rep()
     env = final_rep.get_env()
     dim = final_rep.get_dimensions()
@@ -55,11 +56,9 @@ def compute_distance_to_center(state, players_id):
     return dist
 
 
-def distance_to_center(state, player_ids, player_id):
+def distance_to_center(state, player_id):
     """
     distance to center for the player with player_id
-    takes player_ids as argument probably bc bad design
-    TODO: fix the need for player_ids
     """
-    dist = compute_distance_to_center(state, player_ids)
+    dist = compute_distances_to_center(state)
     return dist[player_id]

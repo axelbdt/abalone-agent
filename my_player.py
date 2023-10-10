@@ -2,6 +2,7 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from sorted_ab_game_tree import create_game_tree, compute_score, expand
+from utils import distance_to_center
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
 
@@ -26,6 +27,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
         self.computed_nodes = 0
+        self.heuristic = lambda x: distance_to_center(x, self.get_id())
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
         """
@@ -43,14 +45,22 @@ class MyPlayer(PlayerAbalone):
             players = current_state.get_players()
             self.opponent = (players[1] if players[0] == self
                              else players[0])
-            self.game_tree = create_game_tree(current_state)
-            compute_score(self.game_tree, self, self.opponent)
+            self.game_tree = create_game_tree(
+                current_state)
+            compute_score(
+                self.game_tree,
+                self,
+                self.opponent,
+                heuristic=lambda x: distance_to_center(x, self.get_id()))
 
         # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
             expand(self.game_tree)
-            compute_score(self.game_tree, self, self.opponent)
+            compute_score(
+                self.game_tree,
+                self, self.opponent,
+                heuristic=self.heuristic)
 
         # compute the next state and action
         next_node = max(self.game_tree[CHILDREN].values(),
