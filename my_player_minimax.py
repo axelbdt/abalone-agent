@@ -24,7 +24,7 @@ class MyPlayer(PlayerAbalone):
         """
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
-        self.extended_nodes = 0
+        self.computed_nodes = 0
 
     def to_json(self):
         return ""
@@ -53,4 +53,5 @@ class MyPlayer(PlayerAbalone):
                          key=lambda x: x[SCORE])
         chosen_action = next_state[ACTION]
         self.game_tree = next_state
+        print("Node scores computed:", self.computed_nodes)
         return chosen_action

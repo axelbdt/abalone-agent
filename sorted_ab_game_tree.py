@@ -18,6 +18,8 @@ def compute_score(game_tree, max_player, min_player):
     if game_tree[SCORE] is not None:
         return game_tree[SCORE]
 
+    max_player.computed_nodes += 1
+
     if game_tree[STATE].is_done():
         game_tree[SCORE] = compute_state_score(
             game_tree[STATE],

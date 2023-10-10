@@ -1,22 +1,41 @@
 minimax
 max_step : 5
-time left : 550.2085106372833
-nodes : 1861133
+time : 551.0449924468994
+Node scores computed: 1861134
 
+-------------------------------------------------
 ab pruning 
 max_step : 5
-time left: 830.5963799953461
-nodes: 336129
+time : 895.8381447792053
+Node scores computed: 10882
 
-max_step : 4
-time left: 891.2298052310944
-nodes: 24655
+time : 888.497948884964
+Node scores computed: 30231
 
+max_step: 7
+time : 774.7707443237305
+Node scores computed: 321430
+
+time : 699.544976234436
+Node scores computed: 516947
+
+-------------------------------------------------
 ab pruning sorted with distance to center
-max_step : 4
-time left: 890.8312456607819
-nodes: 17775
 
+--
 max_step : 5
-time : 833.6672351360321
-nodes: 230794
+time : 898.5093064308167
+Node scores computed: 2365
+
+time : 897.978696346283
+Node scores computed: 3447
+
+--
+max_step : 7
+(lost once?)
+
+time : 875.973935842514
+Node scores computed: 41919
+
+time : 866.8459024429321
+Node scores computed: 60215

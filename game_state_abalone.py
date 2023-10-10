@@ -18,14 +18,14 @@ class GameStateAbalone(GameState):
     Attributes:
         score (list[float]): Scores of the state for each player.
         next_player (Player): Next player to play.
-        players (list[Player]): List of players.
+players (list[Player]): List of players.
         rep (Representation): Representation of the game.
     """
 
     def __init__(self, scores: Dict, next_player: Player, players: List[Player], rep: BoardAbalone, step: int, *args, **kwargs) -> None:
         super().__init__(scores, next_player, players, rep)
         self.max_score = -3  # -6
-        self.max_step = 3  # 50
+        self.max_step = 5  # 50
         self.step = step
 
     def get_step(self) -> int:

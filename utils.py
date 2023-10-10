@@ -1,4 +1,5 @@
 from typing import Dict
+from math import inf
 
 
 def manhattanDist(A, B):
@@ -32,9 +33,9 @@ def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
 
     if len(itera) == 1:
         if itera[0] == max_player:
-            return 1
+            return inf
         else:
-            return -1
+            return -inf
 
 
 def compute_distance_to_center(state, players_id):
