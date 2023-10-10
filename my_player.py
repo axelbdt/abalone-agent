@@ -1,7 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from sorted_ab_game_tree import create_game_tree, compute_score, expand
+from ab_game_tree import create_game_tree, compute_score, expand
 from utils import distance_to_center
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
