@@ -42,4 +42,5 @@ class MyPlayer(PlayerAbalone):
         choice = random.choice(list(possible_actions))
         # print("Random player {} action: {}".format(self.name, choice))
         # print(len(possible_actions))
+        print(current_state.scores)
         return choice

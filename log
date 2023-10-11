@@ -1,0 +1,155 @@
+2023-10-10 11:19:18.733 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_2 - 139964806490208
+2023-10-10 11:19:18.739 | INFO     | seahorse.game.master:step:87 - time : 899.9967246055603
+{139964806489680: -2, 139964806490208: 0}
+2023-10-10 11:19:18.739 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9965345859528
+2023-10-10 11:19:18.739 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W W     
+  _ _ W W _ W _   
+ _ _ _ _ W _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ B   
+  _ _ B B B _ _   
+   B _ B _ B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.740 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_1 - 139964806489680
+2023-10-10 11:19:18.744 | INFO     | seahorse.game.master:step:87 - time : 899.9968509674072
+{139964806489680: -2, 139964806490208: 0}
+2023-10-10 11:19:18.744 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9966819286346
+2023-10-10 11:19:18.744 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W W     
+  _ _ W W _ W _   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ B   
+  _ _ B B B _ _   
+   B _ B _ B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.745 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_2 - 139964806490208
+2023-10-10 11:19:18.751 | INFO     | seahorse.game.master:step:87 - time : 899.9964001178741
+{139964806489680: -2, 139964806490208: 0}
+2023-10-10 11:19:18.752 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.995947599411
+2023-10-10 11:19:18.752 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W W     
+  _ _ W W _ W _   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B B _ _   
+   B _ B _ B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.753 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_1 - 139964806489680
+2023-10-10 11:19:18.760 | INFO     | seahorse.game.master:step:87 - time : 899.9965438842773
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.760 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9959571361542
+2023-10-10 11:19:18.761 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W W     
+  _ _ W W W _ _   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B B _ _   
+   B _ B _ B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.761 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_2 - 139964806490208
+2023-10-10 11:19:18.767 | INFO     | seahorse.game.master:step:87 - time : 899.995680809021
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.767 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9954183101654
+2023-10-10 11:19:18.767 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W W     
+  _ _ W W W _ _   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B _ _ _   
+   B _ B B B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.767 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_1 - 139964806489680
+2023-10-10 11:19:18.772 | INFO     | seahorse.game.master:step:87 - time : 899.9956393241882
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.772 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9954357147217
+2023-10-10 11:19:18.772 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W _     
+  _ _ W W W _ W   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B _ _ _   
+   B _ B B B _     
+    B _ B B B     
+
+2023-10-10 11:19:18.773 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_2 - 139964806490208
+2023-10-10 11:19:18.778 | INFO     | seahorse.game.master:step:87 - time : 899.9952368736267
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.778 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9950230121613
+2023-10-10 11:19:18.778 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W _     
+  _ _ W W W _ W   
+ _ _ _ W _ _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B _ _ _   
+   B _ _ B B B     
+    B _ B B B     
+
+2023-10-10 11:19:18.779 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_1 - 139964806489680
+2023-10-10 11:19:18.785 | INFO     | seahorse.game.master:step:87 - time : 899.9952898025513
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.785 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9948980808258
+2023-10-10 11:19:18.785 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W _     
+  _ _ W W _ _ W   
+ _ _ _ W W _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B _ B B _ _   
+  _ _ B B _ _ _   
+   B _ _ B B B     
+    B _ B B B     
+
+2023-10-10 11:19:18.786 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_2 - 139964806490208
+2023-10-10 11:19:18.793 | INFO     | seahorse.game.master:step:87 - time : 899.9948749542236
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.794 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9943115711212
+2023-10-10 11:19:18.794 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ W W W _     
+   W W _ W W _     
+  _ _ W W _ _ W   
+ _ _ _ W W _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B B B _ _ _   
+  _ _ B B _ _ _   
+   B _ _ B B B     
+    B _ B B B     
+
+2023-10-10 11:19:18.795 | INFO     | seahorse.game.master:play_game:122 - Player now playing : random_player_abalone_1 - 139964806489680
+2023-10-10 11:19:18.799 | INFO     | seahorse.game.master:step:87 - time : 899.9946768283844
+{139964806489680: -2, 139964806490208: -1}
+2023-10-10 11:19:18.800 | INFO     | seahorse.game.time_manager:is_locked:97 - time : 899.9944319725037
+2023-10-10 11:19:18.800 | INFO     | seahorse.game.master:play_game:147 - Current game state: 
+    _ _ W W _     
+   W W _ W W _     
+  _ _ W W _ _ W   
+ _ _ _ W W _ _ _   
+_ _ _ _ _ _ _ _ _ 
+ _ _ B B B _ _ _   
+  _ _ B B _ _ _   
+   B _ _ B B B     
+    B _ B B B     
+
+2023-10-10 11:19:18.800 | INFO     | seahorse.game.master:play_game:157 - 139964806489680 - -3
+2023-10-10 11:19:18.800 | INFO     | seahorse.game.master:play_game:157 - 139964806490208 - -1
+2023-10-10 11:19:18.801 | INFO     | seahorse.game.master:play_game:159 - Winner - random_player_abalone_2
+
+

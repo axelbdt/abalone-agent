@@ -1,4 +1,3 @@
-from typing import Dict
 from math import inf
 
 
@@ -7,7 +6,7 @@ def manhattanDist(A, B):
     return dist
 
 
-def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
+def compute_winner(state):
     """
     Computes the winners of the game based on the scores.
 
@@ -17,6 +16,7 @@ def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
     Returns:
         Iterable[Player]: List of the players who won the game
     """
+    scores = state.scores
     max_val = max(scores.values())
     players_id = list(filter(lambda key: scores[key] == max_val, scores))
     itera = list(filter(lambda x: x.get_id()
@@ -29,13 +29,23 @@ def compute_state_score(state, max_player, scores: Dict[int, float]) -> int:
                      in players_id, state.get_players()))
 
     if len(itera) > 1:
-        return 0
+        return None
 
     if len(itera) == 1:
-        if itera[0] == max_player:
-            return inf
-        else:
-            return -inf
+        return itera[0]
+
+
+def compute_terminal_state_score(state, max_player):
+    """
+    Computes the score of the state for the max_player
+    """
+    winner = compute_winner(state)
+    if winner is None:
+        return 0
+    if winner.get_id() == max_player.get_id():
+        return inf
+    else:
+        return -inf
 
 
 def compute_distances_to_center(state):
@@ -62,3 +72,10 @@ def distance_to_center(state, player_id):
     """
     dist = compute_distances_to_center(state)
     return dist[player_id]
+
+
+def score(state, player_id):
+    """
+    Computes the score of the state for the max_player
+    """
+    return state.scores[player_id]

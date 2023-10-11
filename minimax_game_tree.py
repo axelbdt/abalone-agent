@@ -1,5 +1,5 @@
 import math
-from utils import compute_state_score
+from utils import compute_terminal_state_score
 from keys import STATE, ACTION, SCORE, CHILDREN
 
 
@@ -42,10 +42,9 @@ def compute_score(game_tree, max_player, min_player):
     max_player.computed_nodes += 1
 
     if game_tree[STATE].is_done():
-        game_tree[SCORE] = compute_state_score(
+        game_tree[SCORE] = compute_terminal_state_score(
             game_tree[STATE],
-            max_player,
-            game_tree[STATE].scores)
+            max_player)
         return game_tree[SCORE]
 
     if game_tree[STATE].next_player == max_player:
