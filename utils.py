@@ -1,4 +1,5 @@
 from math import inf
+from keys import STATE
 
 
 def manhattanDist(A, B):
@@ -115,9 +116,13 @@ def compute_normalized_distances_to_center(state):
     return dist
 
 
-def score_and_distance(state, player_id):
+def score_and_distance(state, player_id, opponent_id):
     """
     Combines score and distance to center for an heuristic
     that would give the winner of the game
     """
-    return state.scores[player_id] - (distance_to_center(state, player_id) / 4)
+    scores = state.scores
+    dist = compute_normalized_distances_to_center(state)
+    score_and_dist = scores[player_id] - dist[player_id]
+    opponent_score_and_dist = scores[opponent_id] - dist[opponent_id]
+    return score_and_dist - opponent_score_and_dist

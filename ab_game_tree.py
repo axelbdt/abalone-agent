@@ -57,7 +57,7 @@ def compute_score(game_tree, max_player, min_player, heuristic=None):
         # TODO keep sorted children in game_tree
         children = game_tree[CHILDREN].values()
         if heuristic is not None:
-            children = sorted(children, key=lambda x: heuristic(x[STATE]))
+            children = sorted(children, key=heuristic, reverse=True)
         for child in children:
             # propagate alpha and beta values to child
             child[ALPHA] = game_tree[ALPHA]
@@ -75,7 +75,7 @@ def compute_score(game_tree, max_player, min_player, heuristic=None):
         children = game_tree[CHILDREN].values()
         if heuristic is not None:
             children = sorted(
-                children, key=lambda x: heuristic(x[STATE]), reverse=True)
+                children, key=lambda x: heuristic)
         for child in children:
             # propagate alpha and beta values to child
             child[ALPHA] = game_tree[ALPHA]

@@ -2,7 +2,7 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from ab_game_tree import create_game_tree, compute_score, expand
-from utils import score_and_distance, get_opponent
+from utils import distance_to_center, get_opponent
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
 
@@ -27,7 +27,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
         self.computed_nodes = 0
-        self.heuristic = None
+        self.heuristic = lambda x: -distance_to_center(x[STATE], self.get_id())
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
         """
@@ -42,13 +42,7 @@ class MyPlayer(PlayerAbalone):
         """
         # compute the tree on first run
         if self.game_tree is None:
-            # set the opponent and the heuristic
             self.opponent = get_opponent(current_state, self)
-            player_id = self.get_id()
-            opponent_id = self.opponent.get_id()
-            self.heuristic = lambda x: score_and_distance(
-                x[STATE], player_id, opponent_id)
-
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
