@@ -6,6 +6,16 @@ def manhattanDist(A, B):
     return dist
 
 
+def get_opponent(state, player):
+    """
+    Returns the opponent of the player in the state
+    """
+    players = state.get_players()
+    opponent = (players[1] if players[0] == player
+                else players[0])
+    return opponent
+
+
 def compute_winner(state):
     """
     Computes the winners of the game based on the scores.
@@ -79,3 +89,35 @@ def score(state, player_id):
     Computes the score of the state for the max_player
     """
     return state.scores[player_id]
+
+
+def compute_normalized_distances_to_center(state):
+    """
+    compute the distance to center for each player
+    normalized to be lower than 1 so that score remains more important
+    return a dict with player_id as key and distance as value
+    """
+    players_id = [player.get_id() for player in state.get_players()]
+    final_rep = state.get_rep()
+    env = final_rep.get_env()
+    dim = final_rep.get_dimensions()
+    dist = dict.fromkeys(players_id, 0)
+    pieces = dict.fromkeys(players_id, 0)
+    center = (dim[0]//2, dim[1]//2)
+    for i, j in list(env.keys()):
+        p = env.get((i, j), None)
+        if p.get_owner_id():
+            # divide distance by 5 as the max distance is 4
+            dist[p.get_owner_id()] += manhattanDist(center, (i, j)) / 5
+            pieces[p.get_owner_id()] += 1
+    for player_id in players_id:
+        dist[player_id] /= pieces[player_id]
+    return dist
+
+
+def score_and_distance(state, player_id):
+    """
+    Combines score and distance to center for an heuristic
+    that would give the winner of the game
+    """
+    return state.scores[player_id] - (distance_to_center(state, player_id) / 4)

@@ -4,6 +4,7 @@ from seahorse.game.game_state import GameState
 from ab_game_tree import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN
 from math import inf
+from utils import get_opponent
 
 
 class MyPlayer(PlayerAbalone):
@@ -39,9 +40,7 @@ class MyPlayer(PlayerAbalone):
             Action: selected feasible action
         """
         if self.game_tree is None:
-            players = current_state.get_players()
-            self.opponent = (players[1] if players[0] == self
-                             else players[0])
+            self.opponent = get_opponent(current_state, self)
             self.game_tree = create_game_tree(current_state)
             compute_score(self.game_tree, self, self.opponent)
         if current_state.rep != self.game_tree[STATE].rep:

@@ -2,7 +2,7 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from ab_game_tree import create_game_tree, compute_score, expand
-from utils import distance_to_center
+from utils import distance_to_center, get_opponent
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
 
@@ -42,21 +42,20 @@ class MyPlayer(PlayerAbalone):
         """
         # compute the tree on first run
         if self.game_tree is None:
-            players = current_state.get_players()
-            self.opponent = (players[1] if players[0] == self
-                             else players[0])
+            self.opponent = get_opponent(current_state, self)
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
                 self.game_tree,
                 self,
                 self.opponent,
-                heuristic=lambda x: distance_to_center(x, self.get_id()))
+                heuristic=self.heuristic)
 
         # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
             expand(self.game_tree)
+            # will compute again if the opponent's move wasn't expanded
             compute_score(
                 self.game_tree,
                 self, self.opponent,
