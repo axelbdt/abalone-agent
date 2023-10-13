@@ -10,6 +10,8 @@ from utils import get_opponent
 class MyPlayer(PlayerAbalone):
     """
     Player class for Abalone game.
+    The player will use the alpha-beta pruning algorithm to compute the best action.
+    A different heuristic can be provided in subclasses 
 
     Attributes:
         piece_type (str): piece type of the player
@@ -27,6 +29,10 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
         self.computed_nodes = 0
+        self.heuristic = None
+
+    def get_heuristic(self, state, opponent):
+        return self.heuristic
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
         """
@@ -39,18 +45,37 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
+        # compute the tree on first run
         if self.game_tree is None:
             self.opponent = get_opponent(current_state, self)
-            self.game_tree = create_game_tree(current_state)
-            compute_score(self.game_tree, self, self.opponent)
+            self.heuristic = self.get_heuristic(current_state, self.opponent)
+            self.game_tree = create_game_tree(
+                current_state)
+            compute_score(
+                self.game_tree,
+                self,
+                self.opponent,
+                heuristic=self.heuristic)
+
+        # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
             expand(self.game_tree)
-            compute_score(self.game_tree, self, self.opponent)
+            # will compute again if the opponent's move wasn't expanded
+            compute_score(
+                self.game_tree,
+                self,
+                self.opponent,
+                self.heuristic)
+
+        # compute the next state and action
         next_node = max(self.game_tree[CHILDREN].values(),
                         key=lambda x: x[SCORE] or -inf)
         chosen_action = next_node[ACTION]
+
+        # use the next state as the root of the tree
         self.game_tree = next_node
+
         print("Node scores computed:", self.computed_nodes)
         return chosen_action
 

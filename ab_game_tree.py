@@ -32,7 +32,7 @@ def expand(game_tree):
     return game_tree
 
 
-def compute_score(game_tree, max_player, min_player, heuristic=None):
+def compute_score(game_tree, max_player, min_player, heuristic):
     """
     Computes the score of the game tree by expanding it completely
     and then computing the score of each node from the bottom up
@@ -62,7 +62,7 @@ def compute_score(game_tree, max_player, min_player, heuristic=None):
             # propagate alpha and beta values to child
             child[ALPHA] = game_tree[ALPHA]
             child[BETA] = game_tree[BETA]
-            compute_score(child, max_player, min_player)
+            compute_score(child, max_player, min_player, heuristic)
             game_tree[SCORE] = max(game_tree[SCORE], child[SCORE])
             game_tree[ALPHA] = max(game_tree[ALPHA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:
@@ -75,12 +75,12 @@ def compute_score(game_tree, max_player, min_player, heuristic=None):
         children = game_tree[CHILDREN].values()
         if heuristic is not None:
             children = sorted(
-                children, key=lambda x: heuristic)
+                children, key=heuristic)
         for child in children:
             # propagate alpha and beta values to child
             child[ALPHA] = game_tree[ALPHA]
             child[BETA] = game_tree[BETA]
-            compute_score(child, max_player, min_player)
+            compute_score(child, max_player, min_player, heuristic)
             game_tree[SCORE] = min(game_tree[SCORE], child[SCORE])
             game_tree[BETA] = min(game_tree[BETA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:

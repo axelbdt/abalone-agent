@@ -39,3 +39,10 @@ Node scores computed: 41919
 
 time : 866.8459024429321
 Node scores computed: 60215
+
+-------------------------------------------------
+ab pruning sorted with score and distance
+
+max_step : 7
+time : 709.187557220459
+Node scores computed: 466648

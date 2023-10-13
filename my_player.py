@@ -5,9 +5,10 @@ from ab_game_tree import create_game_tree, compute_score, expand
 from utils import score_and_distance, get_opponent
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
+from my_player_ab import MyPlayer as MyPlayerAB
 
 
-class MyPlayer(PlayerAbalone):
+class MyPlayer(MyPlayerAB):
     """
     Player class for Abalone game.
 
@@ -29,54 +30,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = None
 
-    def compute_action(self, current_state: GameState, **kwargs) -> Action:
-        """
-        Function to implement the logic of the player.
-
-        Args:
-            current_state (GameState): Current game state representation
-            **kwargs: Additional keyword arguments
-
-        Returns:
-            Action: selected feasible action
-        """
-        # compute the tree on first run
-        if self.game_tree is None:
-            # set the opponent and the heuristic
-            self.opponent = get_opponent(current_state, self)
-            player_id = self.get_id()
-            opponent_id = self.opponent.get_id()
-            self.heuristic = lambda x: score_and_distance(
-                x[STATE], player_id, opponent_id)
-
-            self.game_tree = create_game_tree(
-                current_state)
-            compute_score(
-                self.game_tree,
-                self,
-                self.opponent,
-                heuristic=self.heuristic)
-
-        # retrieve the current state in the tree after the opponent's move
-        if current_state.rep != self.game_tree[STATE].rep:
-            self.game_tree = self.game_tree[CHILDREN][current_state.rep]
-            expand(self.game_tree)
-            # will compute again if the opponent's move wasn't expanded
-            compute_score(
-                self.game_tree,
-                self, self.opponent,
-                heuristic=self.heuristic)
-
-        # compute the next state and action
-        next_node = max(self.game_tree[CHILDREN].values(),
-                        key=lambda x: x[SCORE] or -inf)
-        chosen_action = next_node[ACTION]
-
-        # use the next state as the root of the tree
-        self.game_tree = next_node
-
-        print("Node scores computed:", self.computed_nodes)
-        return chosen_action
-
-    def to_json(self) -> dict:
-        return {}
+    def get_heuristic(self, state, opponent):
+        opponent_id = self.opponent.get_id()
+        self.heuristic = lambda x: score_and_distance(
+            x[STATE], self.get_id(), opponent_id)
