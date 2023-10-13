@@ -4,17 +4,17 @@ This projects contains several agents to play abalone on the seahorse platform.
 
 Algorithms implemented:
 
-[x] Minimax
-[x] AB pruning
-[x] AB pruning with nodes sorted by heuristic
-[ ] AB pruning with Transposition Table
-[ ] AB pruning with Iterative Deepening (and TT)
+- [x] Minimax
+- [x] AB pruning
+- [x] AB pruning with nodes sorted by heuristic
+- [ ] AB pruning with Transposition Table
+- [ ] AB pruning with Iterative Deepening (and TT)
 
 Heuristics available:
 
-[x] Distance to center of the board
-[x] Ejected pieces with distance as a tie-breaker
-[ ] Maximise push and ejections available
+- [x] Distance to center of the board
+- [x] Ejected pieces with distance as a tie-breaker
+- [ ] Maximise push and ejections available
 
 ## Run the agents
 
@@ -34,7 +34,7 @@ watchexec -e py -- python main_abalone.py -g -c simplified -t local my_player_ab
 
 #### Simplified config
 
-In addition to classical and `alien` starting position,
+In addition to `classical` and `alien` starting position,
 there is an additionnal `simplified` config where each player has 3 pieces available.
 
 #### Shorter games
