@@ -16,6 +16,29 @@ Heuristics available:
 [x] Ejected pieces with distance as a tie-breaker
 [ ] Maximise push and ejections available
 
+## Run the agents
+
+Run once:
+```
+python main_abalone.py -g -c simplified -t local my_player_ab_distance.py random_player_abalone.py 
+```
+
+More info on options with `python main_abalone.py -h`.
+
+Run on every file change with watchexec:
+```
+watchexec -e py -- python main_abalone.py -g -c simplified -t local my_player_ab_distance.py random_player_abalone.py 
+```
+
+### Simplified config
+
+In addition to classical and `alien` starting position,
+there is an additionnal `simplified` config where each player has 3 pieces available.
+
+### Limit number of turns
+
+To limit the number of turns, change `max_step` in `game_state_abalone` module.
+
 ## Using a heuristic for sorted AB pruning
 
 1. Subclass `MyPlayer` from `my_player_ab` module.
