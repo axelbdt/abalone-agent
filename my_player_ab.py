@@ -31,7 +31,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = None
 
-    def get_heuristic(self, state, opponent):
+    def get_heuristic(self, state):
         return self.heuristic
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
@@ -48,7 +48,7 @@ class MyPlayer(PlayerAbalone):
         # compute the tree on first run
         if self.game_tree is None:
             self.opponent = get_opponent(current_state, self)
-            self.heuristic = self.get_heuristic(current_state, self.opponent)
+            self.heuristic = self.get_heuristic(current_state)
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(

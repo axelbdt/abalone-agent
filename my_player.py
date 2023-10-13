@@ -30,7 +30,8 @@ class MyPlayer(MyPlayerAB):
         self.computed_nodes = 0
         self.heuristic = None
 
-    def get_heuristic(self, state, opponent):
-        opponent_id = self.opponent.get_id()
+    def get_heuristic(self, state):
+        opponent_id = get_opponent(state, self).get_id()
         self.heuristic = lambda x: score_and_distance(
             x[STATE], self.get_id(), opponent_id)
+        return self.heuristic
