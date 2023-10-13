@@ -25,9 +25,16 @@ class MyPlayer(MyPlayerAB):
         self.computed_nodes = 0
         self.heuristic = None
         self.table = {}
+        self.successful_lookups = 0
 
     def get_heuristic(self, state):
         opponent_id = get_opponent(state, self).get_id()
         self.heuristic = lambda x: score_and_distance(
             x[STATE], self.get_id(), opponent_id)
         return self.heuristic
+
+    def compute_action(self, current_state, **kwargs):
+        action = super().compute_action(current_state, **kwargs)
+        print(f"Table size: {len(self.table)}")
+        print(f"Successful lookups: {self.successful_lookups}")
+        return action

@@ -61,6 +61,7 @@ class MyPlayer(PlayerAbalone):
 
         # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
+            expand(self.game_tree)
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
             expand(self.game_tree)
             # will compute again if the opponent's move wasn't expanded

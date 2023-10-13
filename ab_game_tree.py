@@ -1,12 +1,13 @@
 
 import math
 from utils import compute_terminal_state_score
-from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA
+from keys import STATE, ACTION, DEPTH, SCORE, CHILDREN, ALPHA, BETA
 
 
-def create_game_tree(state, action=None):
+def create_game_tree(state,  action=None, depth=0):
     return {
         STATE: state,
+        DEPTH: depth,
         ACTION: action,
         SCORE: None,
         CHILDREN: None,
@@ -25,7 +26,8 @@ def expand(game_tree):
 
     game_tree[CHILDREN] = {
         action.get_next_game_state().rep:
-        create_game_tree(action.get_next_game_state(), action)
+        create_game_tree(action.get_next_game_state(),
+                         action, game_tree[DEPTH] + 1)
         for action in game_tree[STATE].get_possible_actions()
     }
 
@@ -50,6 +52,17 @@ def compute_score(*,
     if game_tree[SCORE] is not None:
         return game_tree[SCORE]
 
+    # TODO: check that lookup state is not deeper than current state
+    if table is not None:
+        rep = game_tree[STATE].rep
+        player_id = game_tree[STATE].next_player.get_id()
+        table_key = (rep, player_id, game_tree[DEPTH])
+        table_result = table.get(table_key)
+        if table_result is not None:
+            max_player.successful_lookups += 1
+            game_tree[SCORE] = table_result
+            return game_tree[SCORE]
+
     max_player.computed_nodes += 1
 
     if game_tree[STATE].is_done():
@@ -60,7 +73,6 @@ def compute_score(*,
 
     if game_tree[STATE].next_player == max_player:
         game_tree[SCORE] = -math.inf
-        # TODO keep sorted children in game_tree
         children = game_tree[CHILDREN].values()
         if heuristic is not None:
             children = sorted(children, key=heuristic, reverse=True)
@@ -78,11 +90,8 @@ def compute_score(*,
             game_tree[ALPHA] = max(game_tree[ALPHA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:
                 break
-        return
-
-    if game_tree[STATE].next_player == min_player:
+    else:  # if game_tree[STATE].next_player == min_player:
         game_tree[SCORE] = math.inf
-        # TODO keep sorted children in game_tree
         children = game_tree[CHILDREN].values()
         if heuristic is not None:
             children = sorted(
@@ -101,4 +110,7 @@ def compute_score(*,
             game_tree[BETA] = min(game_tree[BETA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:
                 break
-        return
+
+    if table is not None:
+        table[table_key] = game_tree[SCORE]
+    return game_tree[SCORE]
