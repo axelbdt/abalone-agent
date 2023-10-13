@@ -10,6 +10,8 @@ from seahorse.game.game_state import GameState
 from seahorse.player.player import Player
 from seahorse.utils.serializer import Serializable
 
+from constants import MAX_STEP, MAX_SCORE
+
 
 class GameStateAbalone(GameState):
     """
@@ -24,8 +26,8 @@ players (list[Player]): List of players.
 
     def __init__(self, scores: Dict, next_player: Player, players: List[Player], rep: BoardAbalone, step: int, *args, **kwargs) -> None:
         super().__init__(scores, next_player, players, rep)
-        self.max_score = -3  # -6
-        self.max_step = 7  # 50
+        self.max_score = MAX_SCORE  # -6
+        self.max_step = MAX_STEP  # 50
         self.step = step
 
     def get_step(self) -> int:

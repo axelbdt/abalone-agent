@@ -24,7 +24,6 @@ class MyPlayer(MyPlayerAB):
         self.game_tree = None
         self.computed_nodes = 0
         self.heuristic = None
-        self.table = {}
 
     def get_heuristic(self, state):
         opponent_id = get_opponent(state, self).get_id()

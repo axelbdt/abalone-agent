@@ -30,6 +30,7 @@ class MyPlayer(PlayerAbalone):
         self.game_tree = None
         self.computed_nodes = 0
         self.heuristic = None
+        self.table = None
 
     def get_heuristic(self, state):
         return self.heuristic
@@ -52,10 +53,11 @@ class MyPlayer(PlayerAbalone):
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
-                self.game_tree,
-                self,
-                self.opponent,
-                heuristic=self.heuristic)
+                game_tree=self.game_tree,
+                max_player=self,
+                min_player=self.opponent,
+                heuristic=self.heuristic,
+                table=self.table)
 
         # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
@@ -63,10 +65,11 @@ class MyPlayer(PlayerAbalone):
             expand(self.game_tree)
             # will compute again if the opponent's move wasn't expanded
             compute_score(
-                self.game_tree,
-                self,
-                self.opponent,
-                self.heuristic)
+                game_tree=self.game_tree,
+                max_player=self,
+                min_player=self.opponent,
+                heuristic=self.heuristic,
+                table=self.table)
 
         # compute the next state and action
         next_node = max(self.game_tree[CHILDREN].values(),

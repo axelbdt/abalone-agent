@@ -35,9 +35,11 @@ watchexec -e py -- python main_abalone.py -g -c simplified -t local my_player_ab
 In addition to classical and `alien` starting position,
 there is an additionnal `simplified` config where each player has 3 pieces available.
 
-### Limit number of turns
+### Shorter games
 
-To limit the number of turns, change `max_step` in `game_state_abalone` module.
+To limit the number of turns, change `MAX_STEP` value in `constants` module.
+
+To limit the goal score, change `MAX_SCORE` value in `constants` module.
 
 ## Using a heuristic for sorted AB pruning
 
