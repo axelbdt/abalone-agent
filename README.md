@@ -30,16 +30,26 @@ Run on every file change with watchexec:
 watchexec -e py -- python main_abalone.py -g -c simplified -t local my_player_ab_distance.py random_player_abalone.py 
 ```
 
-### Simplified config
+### Smaller games
+
+#### Simplified config
 
 In addition to classical and `alien` starting position,
 there is an additionnal `simplified` config where each player has 3 pieces available.
 
-### Shorter games
+#### Shorter games
 
 To limit the number of turns, change `MAX_STEP` value in `constants` module.
 
 To limit the goal score, change `MAX_SCORE` value in `constants` module.
+
+## Measure agent performance
+
+Beside victory, an agent logs the following info :
+
+- Time remaining at the end of the game
+- Nodes where score was computed (as terminal node or from children)
+- (for agents with a Transposition Table) the number of successful lookups
 
 ## Using a heuristic for sorted AB pruning
 
