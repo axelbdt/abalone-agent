@@ -1,8 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from keys import STATE, ACTION, SCORE, CHILDREN
-from math import inf
+from keys import STATE, ACTION
 from utils import score_and_distance, get_opponent
 
 
@@ -53,7 +52,6 @@ class MyPlayer(PlayerAbalone):
                  ACTION: action}
             for action in current_state.get_possible_actions()
         }
-        # print(children.values())
         self.heuristic = self.get_heuristic(current_state)
         chosen_action = max(children.values(), key=self.heuristic)[ACTION]
 
