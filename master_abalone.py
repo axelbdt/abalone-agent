@@ -33,7 +33,14 @@ class MasterAbalone(GameMaster):
             Iterable[Player]: List of the players who won the game
         """
         def manhattanDist(A, B):
-            dist = abs(B[0] - A[0]) + abs(B[1] - A[1])
+            mask1 = [(0,2),(1,3),(2,4)]
+            mask2 = [(0,4)]
+            diff = (abs(B[0] - A[0]),abs(B[1] - A[1]))
+            dist = (abs(B[0] - A[0]) + abs(B[1] - A[1]))/2
+            if diff in mask1:
+                dist += 1
+            if diff in mask2:
+                dist += 2
             return dist
         
         max_val = max(scores.values())
