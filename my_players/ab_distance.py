@@ -4,7 +4,7 @@ from ab_game_tree import create_game_tree, compute_score, expand
 from utils import distance_to_center, get_opponent
 from keys import SCORE, STATE, CHILDREN, ACTION
 from math import inf
-from my_player_ab import MyPlayer as MyPlayerAB
+from ab import MyPlayer as MyPlayerAB
 
 
 class MyPlayer(MyPlayerAB):

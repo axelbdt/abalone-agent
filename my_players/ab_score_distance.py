@@ -1,6 +1,6 @@
 from utils import score_and_distance, get_opponent
 from keys import STATE
-from my_player_ab import MyPlayer as MyPlayerAB
+from ab import MyPlayer as MyPlayerAB
 
 
 class MyPlayer(MyPlayerAB):

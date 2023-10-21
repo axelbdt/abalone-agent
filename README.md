@@ -53,7 +53,7 @@ Beside victory, an agent logs the following info :
 
 ## Using a heuristic for sorted AB pruning
 
-1. Subclass `MyPlayer` from `my_player_ab` module.
+1. Subclass `MyPlayer` from `ab` module.
 2. Define the heuristic as a scalar function of a `GameState` in one of the following places:
     - as the `self.heuristic` attribute in the `__init__` method
     - if your heuristic depends on element unkown at time of `__init__`,
