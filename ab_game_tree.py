@@ -1,7 +1,7 @@
 
 import math
 from utils import compute_terminal_state_score
-from keys import STATE, ACTION, DEPTH, SCORE, CHILDREN, ALPHA, BETA
+from keys import STATE, ACTION, DEPTH, SCORE, CHILDREN, ALPHA, BETA, NEXT
 
 
 def create_game_tree(state,  action=None, depth=0):
@@ -12,7 +12,8 @@ def create_game_tree(state,  action=None, depth=0):
         SCORE: None,
         CHILDREN: None,
         ALPHA: -math.inf,
-        BETA: math.inf
+        BETA: math.inf,
+        NEXT: None
     }
 
 
@@ -59,11 +60,12 @@ def compute_score(*,
         table_key = (rep, player_id, game_tree[DEPTH])
         table_result = table.get(table_key)
         if table_result is not None:
-            max_player.successful_lookups += 1
-            game_tree[SCORE] = table_result
+            game_tree[STATE].get_next_player().increment_successful_lookups()
+            game_tree[SCORE] = table_result[SCORE]
+            game_tree[NEXT] = table_result[NEXT]
             return game_tree[SCORE]
 
-    max_player.computed_nodes += 1
+    game_tree[STATE].get_next_player().increment_computed_nodes()
 
     if game_tree[STATE].is_done():
         game_tree[SCORE] = compute_terminal_state_score(
@@ -89,6 +91,7 @@ def compute_score(*,
             game_tree[SCORE] = max(game_tree[SCORE], child[SCORE])
             game_tree[ALPHA] = max(game_tree[ALPHA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:
+                game_tree[STATE].get_next_player().increment_cutoffs()
                 break
     else:  # if game_tree[STATE].next_player == min_player:
         game_tree[SCORE] = math.inf
@@ -109,8 +112,12 @@ def compute_score(*,
             game_tree[SCORE] = min(game_tree[SCORE], child[SCORE])
             game_tree[BETA] = min(game_tree[BETA], game_tree[SCORE])
             if game_tree[ALPHA] >= game_tree[BETA]:
+                game_tree[STATE].get_next_player().increment_cutoffs()
                 break
 
     if table is not None:
-        table[table_key] = game_tree[SCORE]
+        table[table_key] = {
+            SCORE: game_tree[SCORE],
+            NEXT: game_tree[NEXT]
+        }
     return game_tree[SCORE]

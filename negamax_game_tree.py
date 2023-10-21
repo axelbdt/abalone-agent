@@ -1,13 +1,13 @@
-import math
 from utils import compute_terminal_state_score
 from keys import STATE, ACTION, SCORE, CHILDREN
+from math import inf
 
 
 def create_game_tree(state, action=None):
     return {
         STATE: state,
-        ACTION: action,
         SCORE: None,
+        ACTION: action,
         CHILDREN: None
     }
 
@@ -29,34 +29,27 @@ def expand(game_tree):
     return game_tree
 
 
-def compute_score(game_tree, max_player, min_player):
+def compute_score(game_tree):
     """
     Computes the score of the game tree by expanding it completely
     and then computing the score of each node from the bottom up
-    using the minimax algorithm
+    using the negamax algorithm
     """
     expand(game_tree)
     if game_tree[SCORE] is not None:
-        return
+        return game_tree[SCORE]
 
     game_tree[STATE].get_next_player().increment_computed_nodes()
 
     if game_tree[STATE].is_done():
         game_tree[SCORE] = compute_terminal_state_score(
             game_tree[STATE],
-            max_player)
+            game_tree[STATE].next_player)
         return game_tree[SCORE]
 
-    if game_tree[STATE].next_player == max_player:
-        game_tree[SCORE] = -math.inf
-        for child in game_tree[CHILDREN].values():
-            compute_score(child, max_player, min_player)
-            game_tree[SCORE] = max(game_tree[SCORE], child[SCORE])
-        return
+    game_tree[SCORE] = -inf
+    for child in game_tree[CHILDREN].values():
+        compute_score(child)
+        game_tree[SCORE] = max(game_tree[SCORE], -child[SCORE])
 
-    if game_tree[STATE].next_player == min_player:
-        game_tree[SCORE] = math.inf
-        for child in game_tree[CHILDREN].values():
-            compute_score(child, max_player, min_player)
-            game_tree[SCORE] = min(game_tree[SCORE], child[SCORE])
-        return
+    return game_tree[SCORE]

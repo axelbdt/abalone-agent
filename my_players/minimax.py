@@ -52,5 +52,5 @@ class MyPlayer(PlayerAbalone):
                          key=lambda x: x[SCORE])
         chosen_action = next_state[ACTION]
         self.game_tree = next_state
-        print("Node scores computed:", self.computed_nodes)
+        print(self.info)
         return chosen_action

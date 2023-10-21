@@ -1,11 +1,10 @@
 from math import inf
-from keys import STATE
 
 
 def manhattanDist(A, B):
-    mask1 = [(0,2),(1,3),(2,4)]
-    mask2 = [(0,4)]
-    diff = (abs(B[0] - A[0]),abs(B[1] - A[1]))
+    mask1 = [(0, 2), (1, 3), (2, 4)]
+    mask2 = [(0, 4)]
+    diff = (abs(B[0] - A[0]), abs(B[1] - A[1]))
     dist = (abs(B[0] - A[0]) + abs(B[1] - A[1]))/2
     if diff in mask1:
         dist += 1
@@ -16,7 +15,7 @@ def manhattanDist(A, B):
 
 def get_opponent(state, player):
     """
-    Returns the opponent of the player in the state
+    Returns the opponent of the player supplied as argument
     """
     players = state.get_players()
     opponent = (players[1] if players[0] == player
@@ -133,3 +132,22 @@ def score_and_distance(state, player_id, opponent_id):
     score_and_dist = scores[player_id] - dist[player_id]
     opponent_score_and_dist = scores[opponent_id] - dist[opponent_id]
     return score_and_dist - opponent_score_and_dist
+
+
+def score_and_distance_sym(state):
+    # TODO: find better name
+    """
+    Combines score and distance to center for an heuristic
+    that would give the winner of the game
+    """
+    scores = state.scores
+    # player_id = state.get_next_player().get_id()
+    # opponent_id = get_opponent(state, player_id).get_id()
+    opponent = state.get_next_player()
+    opponent_id = opponent.get_id()
+    player_id = get_opponent(state, opponent).get_id()
+    dist = compute_normalized_distances_to_center(state)
+    score_and_dist = scores[player_id] - dist[player_id]
+    opponent_score_and_dist = scores[opponent_id] - dist[opponent_id]
+    result = score_and_dist - opponent_score_and_dist
+    return result
