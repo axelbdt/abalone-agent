@@ -1,7 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from minimax_game_tree import create_game_tree, expand, compute_score
+from search.minimax_game_tree import create_game_tree, expand, compute_score
 from keys import STATE, ACTION, SCORE, CHILDREN
 from utils import get_opponent
 

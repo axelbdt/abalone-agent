@@ -1,4 +1,4 @@
-from utils import score_and_distance, get_opponent
+from utils import score_and_distance_sym
 from keys import STATE
 from ab import MyPlayer as MyPlayerAB
 
@@ -22,11 +22,4 @@ class MyPlayer(MyPlayerAB):
         """
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
-        self.computed_nodes = 0
-        self.heuristic = None
-
-    def get_heuristic(self, state):
-        opponent_id = get_opponent(state, self).get_id()
-        self.heuristic = lambda x: score_and_distance(
-            x[STATE], self.get_id(), opponent_id)
-        return self.heuristic
+        self.heuristic = lambda x: score_and_distance_sym(x[STATE])

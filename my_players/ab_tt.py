@@ -1,6 +1,6 @@
 from utils import score_and_distance_sym, get_opponent
 from keys import STATE
-from ab_negamax import MyPlayer as MyPlayerAB
+from ab import MyPlayer as MyPlayerAB
 
 
 class MyPlayer(MyPlayerAB):
@@ -23,6 +23,5 @@ class MyPlayer(MyPlayerAB):
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
         self.computed_nodes = 0
-        self.heuristic = lambda x: score_and_distance_sym(x[STATE])
         self.table = {}
         self.successful_lookups = 0

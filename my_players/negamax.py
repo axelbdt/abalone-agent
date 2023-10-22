@@ -1,7 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from negamax_game_tree import create_game_tree, expand, compute_score
+from search.negamax_game_tree import create_game_tree, expand, compute_score
 from keys import STATE, ACTION, SCORE, CHILDREN
 from math import inf
 

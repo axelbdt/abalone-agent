@@ -1,10 +1,10 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from ab_negamax_game_tree import create_game_tree, compute_score, expand
+from search.ab_game_tree import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT
 from math import inf
-from utils import get_opponent, score_and_distance
+from utils import get_opponent
 
 
 class MyPlayer(PlayerAbalone):
@@ -32,6 +32,9 @@ class MyPlayer(PlayerAbalone):
         self.heuristic = None
         self.table = None
 
+    def to_json(self):
+        return ""
+
     def get_heuristic(self, state):
         return self.heuristic
 
@@ -54,6 +57,8 @@ class MyPlayer(PlayerAbalone):
                 current_state)
             compute_score(
                 game_tree=self.game_tree,
+                max_player=self,
+                min_player=self.opponent,
                 heuristic=self.heuristic,
                 table=self.table)
 
@@ -65,20 +70,22 @@ class MyPlayer(PlayerAbalone):
             # will compute again if the opponent's move wasn't expanded
             compute_score(
                 game_tree=self.game_tree,
+                max_player=self,
+                min_player=self.opponent,
                 heuristic=self.heuristic,
                 table=self.table)
 
-        # next_node = self.game_tree[NEXT]
-        next_node = max(self.game_tree[CHILDREN].values(
-        ), key=lambda x: - (x[SCORE] or inf))
+        # compute the next state and action
+        if self.game_tree[NEXT] is None:
+            self.game_tree[NEXT] = max(
+                self.game_tree[CHILDREN].values(),
+                key=lambda x: x[SCORE] or -inf)
 
-        chosen_action = next_node[ACTION]
+        chosen_action = self.game_tree[NEXT][ACTION]
 
         # use the next state as the root of the tree
-        self.game_tree = next_node
+        self.game_tree = self.game_tree[NEXT]
 
         print(self.info)
         return chosen_action
 
-    def to_json(self):
-        return ""
