@@ -31,16 +31,9 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = None
         self.table = None
-        self.heuristic2 = None
 
     def get_heuristic(self, state):
         return self.heuristic
-
-    def get_heuristic2(self, state):
-        opponent_id = get_opponent(state, self).get_id()
-        self.heuristic2 = lambda x: score_and_distance(
-            x[STATE], self.get_id(), opponent_id)
-        return self.heuristic2
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
         """
@@ -57,14 +50,12 @@ class MyPlayer(PlayerAbalone):
         if self.game_tree is None:
             self.opponent = get_opponent(current_state, self)
             self.heuristic = self.get_heuristic(current_state)
-            self.heuristic2 = self.get_heuristic2(current_state)
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
                 game_tree=self.game_tree,
                 heuristic=self.heuristic,
-                table=self.table,
-                heuristic2=self.heuristic2)
+                table=self.table)
 
         # retrieve the current state in the tree after the opponent's move
         if current_state.rep != self.game_tree[STATE].rep:
@@ -75,8 +66,7 @@ class MyPlayer(PlayerAbalone):
             compute_score(
                 game_tree=self.game_tree,
                 heuristic=self.heuristic,
-                table=self.table,
-                heuristic2=self.heuristic2)
+                table=self.table)
 
         # next_node = self.game_tree[NEXT]
         next_node = max(self.game_tree[CHILDREN].values(
