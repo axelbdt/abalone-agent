@@ -1,10 +1,10 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from search.ab_game_tree import create_game_tree, compute_score, expand
+from search.full.ab_negamax_game_tree import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT
 from math import inf
-from utils import get_opponent
+from utils import get_opponent, score_and_distance
 
 
 class MyPlayer(PlayerAbalone):
@@ -57,8 +57,6 @@ class MyPlayer(PlayerAbalone):
                 current_state)
             compute_score(
                 game_tree=self.game_tree,
-                max_player=self,
-                min_player=self.opponent,
                 heuristic=self.heuristic,
                 table=self.table)
 
@@ -70,22 +68,18 @@ class MyPlayer(PlayerAbalone):
             # will compute again if the opponent's move wasn't expanded
             compute_score(
                 game_tree=self.game_tree,
-                max_player=self,
-                min_player=self.opponent,
                 heuristic=self.heuristic,
                 table=self.table)
 
-        # compute the next state and action
-        if self.game_tree[NEXT] is None:
-            self.game_tree[NEXT] = max(
-                self.game_tree[CHILDREN].values(),
-                key=lambda x: x[SCORE] or -inf)
+        # next_node = self.game_tree[NEXT]
+        next_node = max(self.game_tree[CHILDREN].values(
+        ), key=lambda x: - (x[SCORE] or inf))
 
-        chosen_action = self.game_tree[NEXT][ACTION]
+        chosen_action = next_node[ACTION]
 
         # use the next state as the root of the tree
-        self.game_tree = self.game_tree[NEXT]
+        self.game_tree = next_node
 
         print(self.info)
+        print("USING NEGAMAX")
         return chosen_action
-
