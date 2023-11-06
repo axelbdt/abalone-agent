@@ -1,6 +1,6 @@
 from greedy import MyPlayer as MyPlayerGreedy
 from keys import STATE
-from utils import score_and_distance_sym
+from utils import pressure
 
 
 class MyPlayer(MyPlayerGreedy):
@@ -23,4 +23,4 @@ class MyPlayer(MyPlayerGreedy):
             time_limit (float, optional): the time limit in (s)
         """
         super().__init__(piece_type, name, time_limit, *args)
-        self.heuristic = lambda x: score_and_distance_sym(x[STATE])
+        self.heuristic = lambda x: pressure(x[STATE])
