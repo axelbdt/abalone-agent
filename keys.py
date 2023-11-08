@@ -7,6 +7,7 @@ CHILDREN = "children"
 ALPHA = "alpha"
 BETA = "beta"
 NEXT = "next"
+TURN = "turn"
 
 
 # constants for info dict keys

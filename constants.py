@@ -1,2 +1,2 @@
-MAX_STEP = 3  # 50
-MAX_SCORE = -2  # -6
+MAX_STEP = 50  # 50
+MAX_SCORE = -6  # -6
