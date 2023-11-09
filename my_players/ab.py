@@ -32,7 +32,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = lambda x: score_and_distance_sym(x[STATE])
         self.table = {}
-        self.search_depth = 2
+        self.search_depth = 3
 
     def to_json(self):
         return ""
@@ -75,10 +75,4 @@ class MyPlayer(PlayerAbalone):
 
         # use the next state as the root of the tree
         self.game_tree = next_node
-        print("Computed nodes:", self.info[COMPUTED_NODES])
-        print("Nb cutoffs:", self.info[CUTOFFS])
-        print("Nb successful lookups:", self.info[SUCCESSFUL_LOOKUPS])
-        print("Table size:", len(self.table))
-        print("Turn:", self.game_tree[STATE].step)
-
         return chosen_action
