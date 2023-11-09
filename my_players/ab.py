@@ -5,7 +5,7 @@ from search.ab_negamax_game_tree import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT, DEPTH, TURN
 from keys import CUTOFFS, COMPUTED_NODES, SUCCESSFUL_LOOKUPS
 from math import inf
-from utils import score_and_distance_sym
+from utils import get_opponent, score_and_distance_sym
 
 
 class MyPlayer(PlayerAbalone):
@@ -50,6 +50,7 @@ class MyPlayer(PlayerAbalone):
         """
         # compute the tree on first run
         if self.game_tree is None:
+            self.opponent = get_opponent(current_state, self)
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
