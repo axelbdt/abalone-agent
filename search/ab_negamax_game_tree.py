@@ -36,8 +36,9 @@ def compute_score(*, game_tree, depth=0, heuristic, table):
     and then computing the score of each node from the bottom up
     using the negamax algorithm
     """
+    endgame = game_tree[STATE].step + depth >= game_tree[STATE].max_step
     rep = game_tree[STATE].rep
-    table_key = (rep, game_tree[STATE].step)
+    table_key = (rep, endgame)
     lookup_result = table.get(table_key)
     if lookup_result is not None and lookup_result[DEPTH] >= depth:
         score = lookup_result[SCORE]
