@@ -6,12 +6,10 @@ from math import inf
 def create_game_tree(state, action=None):
     return {
         STATE: state,
-        NEXT: None,
         ACTION: action,
         CHILDREN: None,
         ALPHA: -inf,
         BETA: inf,
-        DEPTH: -inf,
     }
 
 
@@ -44,13 +42,12 @@ def compute_score(*, game_tree, depth=0, heuristic, table):
     if lookup_result is not None and lookup_result[DEPTH] >= depth:
         score = lookup_result[SCORE]
         game_tree[STATE].get_next_player().increment_successful_lookups()
-        # game_tree[NEXT] = lookup_result[NEXT]
         return score
     elif game_tree[STATE].is_done():
         score = compute_terminal_state_score(
             game_tree[STATE],
             game_tree[STATE].next_player)
-        game_tree[DEPTH] = inf
+        depth = inf
     elif depth == 0:
         # heuristic evaluates from next player (opponent) perspective
         score = - heuristic(game_tree)
@@ -61,7 +58,7 @@ def compute_score(*, game_tree, depth=0, heuristic, table):
         if heuristic is not None:
             children = sorted(
                 game_tree[CHILDREN].values(),
-                key=heuristic,
+                key=lambda x : compute_score(game_tree=x, depth=0, heuristic=heuristic, table=table),
                 reverse=True)
         for child in children:
             child[ALPHA] = -game_tree[BETA]
@@ -75,7 +72,6 @@ def compute_score(*, game_tree, depth=0, heuristic, table):
 
     table[table_key] = {
         SCORE: score,
-        # NEXT: game_tree[NEXT],
         DEPTH: depth,
     }
 
