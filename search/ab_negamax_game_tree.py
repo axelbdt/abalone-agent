@@ -6,7 +6,6 @@ from math import inf
 def create_game_tree(state, action=None):
     return {
         STATE: state,
-        SCORE: None,
         NEXT: None,
         ACTION: action,
         CHILDREN: None,
@@ -33,62 +32,51 @@ def expand(game_tree):
     return game_tree
 
 
-def compute_score(*, game_tree, depth=0, heuristic=None, table=None):
+def compute_score(*, game_tree, depth=0, heuristic, table):
     """
     Computes the score of the game tree by expanding it completely
     and then computing the score of each node from the bottom up
     using the negamax algorithm
     """
-    if game_tree[SCORE] is not None and game_tree[DEPTH] >= depth:
-        return game_tree[SCORE]
-
-    if table is not None:
-        rep = game_tree[STATE].rep
-        table_key = (rep, game_tree[STATE].step)
-        lookup_result = table.get(table_key)
-        if lookup_result is not None:
-            game_tree[STATE].get_next_player().increment_successful_lookups()
-            game_tree[SCORE] = lookup_result[SCORE]
-            game_tree[NEXT] = lookup_result[NEXT]
-            return game_tree[SCORE]
-
-    game_tree[STATE].get_next_player().increment_computed_nodes()
-    if depth == 0:
-        # heuristic evaluates from next player (opponent) perspective
-        game_tree[SCORE] = - heuristic(game_tree)
-        game_tree[DEPTH] = 0
-        return game_tree[SCORE]
-
-    if game_tree[STATE].is_done():
-        game_tree[SCORE] = compute_terminal_state_score(
+    rep = game_tree[STATE].rep
+    table_key = (rep, game_tree[STATE].step)
+    lookup_result = table.get(table_key)
+    if lookup_result is not None and lookup_result[DEPTH] >= depth:
+        score = lookup_result[SCORE]
+        game_tree[STATE].get_next_player().increment_successful_lookups()
+        # game_tree[NEXT] = lookup_result[NEXT]
+        return score
+    elif game_tree[STATE].is_done():
+        score = compute_terminal_state_score(
             game_tree[STATE],
             game_tree[STATE].next_player)
         game_tree[DEPTH] = inf
-        return game_tree[SCORE]
+    elif depth == 0:
+        # heuristic evaluates from next player (opponent) perspective
+        score = - heuristic(game_tree)
+    else:
+        expand(game_tree)
+        score = -inf
+        children = game_tree[CHILDREN].values()
+        if heuristic is not None:
+            children = sorted(
+                game_tree[CHILDREN].values(),
+                key=heuristic,
+                reverse=True)
+        for child in children:
+            child[ALPHA] = -game_tree[BETA]
+            child[BETA] = -game_tree[ALPHA]
+            child_score = compute_score(game_tree=child, depth=depth-1, heuristic=heuristic, table=table)
+            score = max(score, -child_score)
+            game_tree[ALPHA] = max(game_tree[ALPHA], score)
+            if game_tree[ALPHA] >= game_tree[BETA]:
+                game_tree[STATE].get_next_player().increment_cutoffs()
+                break
 
-    expand(game_tree)
-    game_tree[SCORE] = -inf
-    children = game_tree[CHILDREN].values()
-    if heuristic is not None:
-        children = sorted(
-            game_tree[CHILDREN].values(),
-            key=heuristic,
-            reverse=True)
-    for child in children:
-        child[ALPHA] = -game_tree[BETA]
-        child[BETA] = -game_tree[ALPHA]
-        compute_score(game_tree=child, depth=depth-1, heuristic=heuristic, table=table)
-        game_tree[SCORE] = max(game_tree[SCORE], -child[SCORE])
-        game_tree[ALPHA] = max(game_tree[ALPHA], game_tree[SCORE])
-        if game_tree[ALPHA] >= game_tree[BETA]:
-            game_tree[STATE].get_next_player().increment_cutoffs()
-            break
+    table[table_key] = {
+        SCORE: score,
+        # NEXT: game_tree[NEXT],
+        DEPTH: depth,
+    }
 
-    if table is not None:
-        table[table_key] = {
-            SCORE: game_tree[SCORE],
-            NEXT: game_tree[NEXT],
-        }
-
-    game_tree[DEPTH] = depth
-    return game_tree[SCORE]
+    return score

@@ -32,13 +32,10 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = lambda x: score_and_distance_sym(x[STATE])
         self.table = {}
-        self.search_depth = 4
+        self.search_depth = 2
 
     def to_json(self):
         return ""
-
-    def get_heuristic(self, state):
-        return self.heuristic
 
     def compute_action(self, current_state: GameState, **kwargs) -> Action:
         """
@@ -54,7 +51,6 @@ class MyPlayer(PlayerAbalone):
         # compute the tree on first run
         if self.game_tree is None:
             self.opponent = get_opponent(current_state, self)
-            self.heuristic = self.get_heuristic(current_state)
             self.game_tree = create_game_tree(
                 current_state)
             compute_score(
@@ -70,26 +66,19 @@ class MyPlayer(PlayerAbalone):
             # will compute again if the opponent's move wasn't expanded
 
         expand(self.game_tree)
-        compute_score(
-            game_tree=self.game_tree,
-            depth = self.search_depth,
-            heuristic=self.heuristic,
-            table=self.table)
-
         # next_node = self.game_tree[NEXT]
-        next_node = max(self.game_tree[CHILDREN].values(
-        ), key=lambda x: - (x[SCORE] or inf))
+        next_node = min(
+                self.game_tree[CHILDREN].values(),
+                key=lambda x: compute_score(game_tree=x, depth = self.search_depth - 1, heuristic=self.heuristic, table=self.table) or inf)
 
         chosen_action = next_node[ACTION]
-        if next_node[SCORE] is None:
-            print([x[SCORE] for x in self.game_tree[CHILDREN].values()])
-            print("""WARNING: The score of the chosen action is None.""")
 
         # use the next state as the root of the tree
         self.game_tree = next_node
         print("Computed nodes:", self.info[COMPUTED_NODES])
         print("Nb cutoffs:", self.info[CUTOFFS])
         print("Nb successful lookups:", self.info[SUCCESSFUL_LOOKUPS])
+        print("Table size:", len(self.table))
         print("Turn:", self.game_tree[STATE].step)
 
         return chosen_action
