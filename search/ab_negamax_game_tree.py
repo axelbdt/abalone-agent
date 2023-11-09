@@ -3,10 +3,9 @@ from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA, TURN, NEXT, DEPTH
 from math import inf
 
 
-def create_game_tree(state, turn=0, action=None):
+def create_game_tree(state, action=None):
     return {
         STATE: state,
-        TURN: turn,
         SCORE: None,
         NEXT: None,
         ACTION: action,
@@ -27,8 +26,7 @@ def expand(game_tree):
 
     game_tree[CHILDREN] = {
         action.get_next_game_state().rep:
-        create_game_tree(action.get_next_game_state(),
-                         game_tree[TURN] + 1, action)
+        create_game_tree(action.get_next_game_state(), action)
         for action in game_tree[STATE].get_possible_actions()
     }
 
@@ -41,13 +39,12 @@ def compute_score(*, game_tree, depth=0, heuristic=None, table=None):
     and then computing the score of each node from the bottom up
     using the negamax algorithm
     """
-    # print("Computing score", "depth", depth, "turn", game_tree[TURN])
-    if game_tree[SCORE] is not None and game_tree[DEPTH] < depth:
+    if game_tree[SCORE] is not None and game_tree[DEPTH] >= depth:
         return game_tree[SCORE]
 
     if table is not None:
         rep = game_tree[STATE].rep
-        table_key = (rep, game_tree[TURN])
+        table_key = (rep, game_tree[STATE].step)
         lookup_result = table.get(table_key)
         if lookup_result is not None:
             game_tree[STATE].get_next_player().increment_successful_lookups()

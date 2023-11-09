@@ -2,7 +2,8 @@ from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from search.ab_negamax_game_tree import create_game_tree, compute_score, expand
-from keys import STATE, ACTION, SCORE, CHILDREN, NEXT
+from keys import STATE, ACTION, SCORE, CHILDREN, NEXT, DEPTH, TURN
+from keys import CUTOFFS, COMPUTED_NODES, SUCCESSFUL_LOOKUPS
 from math import inf
 from utils import get_opponent, score_and_distance_sym
 
@@ -31,7 +32,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = lambda x: score_and_distance_sym(x[STATE])
         self.table = {}
-        self.search_depth = 3
+        self.search_depth = 4
 
     def to_json(self):
         return ""
@@ -67,7 +68,7 @@ class MyPlayer(PlayerAbalone):
             expand(self.game_tree)
             self.game_tree = self.game_tree[CHILDREN][current_state.rep]
             # will compute again if the opponent's move wasn't expanded
-        
+
         expand(self.game_tree)
         compute_score(
             game_tree=self.game_tree,
@@ -86,5 +87,9 @@ class MyPlayer(PlayerAbalone):
 
         # use the next state as the root of the tree
         self.game_tree = next_node
+        print("Computed nodes:", self.info[COMPUTED_NODES])
+        print("Nb cutoffs:", self.info[CUTOFFS])
+        print("Nb successful lookups:", self.info[SUCCESSFUL_LOOKUPS])
+        print("Turn:", self.game_tree[STATE].step)
 
         return chosen_action
