@@ -32,7 +32,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = score_and_distance_sym
         self.table = {}
-        self.search_depth = 3
+        self.search_depth = 2
 
     def to_json(self):
         return ""

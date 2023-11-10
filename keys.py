@@ -8,6 +8,7 @@ ALPHA = "alpha"
 BETA = "beta"
 NEXT = "next"
 TURN = "turn"
+PLAYER = "player"
 
 
 # constants for info dict keys

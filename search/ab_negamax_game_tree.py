@@ -1,13 +1,14 @@
 from utils import compute_terminal_state_score, compute_normalized_distances_to_center
-from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA, TURN, NEXT, DEPTH
+from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA, TURN, NEXT, DEPTH, PLAYER
 from math import inf
 
 
 def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
-    table_key = (state.rep, state.step)
+    endgame = state.step + depth > state.max_step
+    table_key = (state.rep, endgame)
     lookup_result = table.get(table_key)
     if lookup_result is not None and lookup_result[DEPTH] >= depth:
-        score = lookup_result[SCORE]
+        score = lookup_result[SCORE] if lookup_result[PLAYER] == state.get_next_player() else -lookup_result[SCORE]
         state.get_next_player().increment_successful_lookups()
         return score
     elif state.is_done():
@@ -23,7 +24,6 @@ def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
                 state.get_possible_actions(),
                 key=lambda x : compute_state_score(x.get_next_game_state(), depth=0, heuristic=heuristic, table=table, alpha=-beta, beta=-alpha),
                 )
-        # children = state.get_possible_actions()
         for child in children:
             child_score = compute_state_score(
                     child.get_next_game_state(),
@@ -42,6 +42,7 @@ def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
     table[table_key] = {
         SCORE: score,
         DEPTH: depth,
+        PLAYER: state.get_next_player()
     }
 
     return score
