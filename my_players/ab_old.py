@@ -1,7 +1,7 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from search.ab_negamax_game_tree import compute_state_score
+from search.ab_negamax_game_tree_old import create_game_tree, compute_score, expand
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT, DEPTH, TURN
 from keys import CUTOFFS, COMPUTED_NODES, SUCCESSFUL_LOOKUPS
 from math import inf
@@ -30,7 +30,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
         self.computed_nodes = 0
-        self.heuristic = score_and_distance_sym
+        self.heuristic = lambda x: score_and_distance_sym(x[STATE])
         self.table = {}
         self.search_depth = 3
 
@@ -48,8 +48,31 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        next_action = max(
-                current_state.get_possible_actions(),
-                key=lambda x: -compute_state_score(x.get_next_game_state(), depth = self.search_depth - 1, heuristic=self.heuristic, table=self.table) or inf)
+        # compute the tree on first run
+        if self.game_tree is None:
+            self.opponent = get_opponent(current_state, self)
+            self.game_tree = create_game_tree(
+                current_state)
+            compute_score(
+                game_tree=self.game_tree,
+                depth = self.search_depth,
+                heuristic=self.heuristic,
+                table=self.table)
 
-        return next_action
+        # retrieve the current state in the tree after the opponent's move
+        if current_state.rep != self.game_tree[STATE].rep:
+            expand(self.game_tree)
+            self.game_tree = self.game_tree[CHILDREN][current_state.rep]
+            # will compute again if the opponent's move wasn't expanded
+
+        expand(self.game_tree)
+        # next_node = self.game_tree[NEXT]
+        next_node = min(
+                self.game_tree[CHILDREN].values(),
+                key=lambda x: compute_score(game_tree=x, depth = self.search_depth - 1, heuristic=self.heuristic, table=self.table) or inf)
+
+        chosen_action = next_node[ACTION]
+
+        # use the next state as the root of the tree
+        self.game_tree = next_node
+        return chosen_action

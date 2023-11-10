@@ -56,14 +56,14 @@ def compute_winner(state):
         return itera[0]
 
 
-def compute_terminal_state_score(state, max_player):
+def compute_terminal_state_score(state):
     """
     Computes the score of the state for the max_player
     """
     winner = compute_winner(state)
     if winner is None:
         return 0
-    if winner.get_id() == max_player.get_id():
+    if winner.get_id() == state.get_next_player().get_id():
         return inf
     else:
         return -inf
@@ -149,11 +149,12 @@ def score_and_distance_sym(state):
     that would give the winner of the game
     """
     scores = state.scores
-    # player_id = state.get_next_player().get_id()
-    # opponent_id = get_opponent(state, player_id).get_id()
-    opponent = state.get_next_player()
+    player = state.get_next_player()
+    opponent = get_opponent(state, player)
+    # opponent = state.get_next_player()
+    # player = get_opponent(state, opponent)
+    player_id = player.get_id()
     opponent_id = opponent.get_id()
-    player_id = get_opponent(state, opponent).get_id()
     dist = compute_normalized_distances_to_center(state)
     score_and_dist = scores[player_id] - dist[player_id]
     opponent_score_and_dist = scores[opponent_id] - dist[opponent_id]

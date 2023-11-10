@@ -49,7 +49,7 @@ class MyPlayer(PlayerAbalone):
             for action in current_state.get_possible_actions()
         }
         self.heuristic = self.get_heuristic(current_state)
-        chosen_action = max(children.values(), key=self.heuristic)[ACTION]
+        chosen_action = min(children.values(), key=self.heuristic)[ACTION]
 
         self.round += 1
         print("Round:", self.round)
