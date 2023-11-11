@@ -1,6 +1,7 @@
 from utils import compute_terminal_state_score, compute_normalized_distances_to_center
 from keys import STATE, ACTION, SCORE, CHILDREN, ALPHA, BETA, TURN, NEXT, DEPTH, PLAYER
 from math import inf
+import time
 
 
 def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):

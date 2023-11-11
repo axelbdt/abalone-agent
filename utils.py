@@ -348,6 +348,19 @@ def get_avg_pushes(state, player):
     nb_pushes_avg = sum(nb_pushes) / len(nb_pushes)
     return nb_pushes_avg
 
+def get_pushes2(state):
+    player = state.get_next_player()
+    opponent = get_opponent(state, player)
+    opponent_positions = set(state.get_rep().get_pieces_player(opponent)[1])
+
+    pushes = sum(len(set(action.get_next_game_state().get_rep().get_pieces_player(opponent)[1])
+                  - opponent_positions)
+                  for action in state.get_possible_actions())
+
+    return pushes
+
+    
+
 
 def get_pushes(state):
     """

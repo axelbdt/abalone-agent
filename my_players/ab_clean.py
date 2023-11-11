@@ -5,7 +5,7 @@ from search.ab_negamax_game_tree import compute_state_score
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT, DEPTH, TURN
 from keys import CUTOFFS, COMPUTED_NODES, SUCCESSFUL_LOOKUPS
 from math import inf
-from utils import get_opponent, score_and_distance_sym, get_pushes2
+from utils import get_opponent, score_and_distance_sym
 
 
 class MyPlayer(PlayerAbalone):
@@ -32,7 +32,7 @@ class MyPlayer(PlayerAbalone):
         self.computed_nodes = 0
         self.heuristic = score_and_distance_sym
         self.table = {}
-        self.search_depth = 3
+        self.search_depth = 2
 
     def to_json(self):
         return ""
@@ -48,15 +48,8 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        print("Get pushes: ", get_pushes2(current_state))
-        if get_pushes2(current_state) == 0:
-            depth = 1
-        elif self.get_remaining_time() < 10:
-            depth = 2
-        else:
-            depth = self.search_depth
         next_action = max(
                 current_state.get_possible_actions(),
-                key=lambda x: -compute_state_score(x.get_next_game_state(), depth = depth-1, heuristic=self.heuristic, table=self.table))
+                key=lambda x: -compute_state_score(x.get_next_game_state(), depth = self.search_depth - 1, heuristic=self.heuristic, table=self.table))
 
         return next_action
