@@ -50,6 +50,13 @@ class MyPlayer(PlayerAbalone):
         """
         next_action = max(
                 current_state.get_possible_actions(),
-                key=lambda x: -compute_state_score(x.get_next_game_state(), depth = self.search_depth - 1, heuristic=self.heuristic, table=self.table))
+                key=lambda x:
+                    - compute_state_score(
+                        state=x.get_next_game_state(),
+                        depth=self.search_depth - 1,
+                        heuristic=self.heuristic,
+                        table=self.table,
+                        quiescence_test=False,
+                        previous_state=current_state))
 
         return next_action

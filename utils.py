@@ -353,10 +353,23 @@ def get_pushes2(state):
     opponent = get_opponent(state, player)
     opponent_positions = set(state.get_rep().get_pieces_player(opponent)[1])
 
-    pushes = sum(len(set(action.get_next_game_state().get_rep().get_pieces_player(opponent)[1])
-                  - opponent_positions)
+    pushes = sum(len(opponent_positions -
+                     set(action.get_next_game_state().get_rep().get_pieces_player(opponent)[1]))
                   for action in state.get_possible_actions())
     return pushes
+
+def push_happened(state, previous_state):
+    """
+    Checks if a push happened between the previous state and the current state
+    """
+    player = state.get_next_player()
+    # Get the previous positions of the given player's pieces
+    prev_pos = previous_state.get_rep().get_pieces_player(player)[1]
+
+    # Differences in the positions of the given player's pieces
+    new_pos = state.get_rep().get_pieces_player(player)[1]
+    return not (set(new_pos) == set(prev_pos))
+
 
     
 

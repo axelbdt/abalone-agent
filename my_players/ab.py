@@ -1,12 +1,11 @@
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
-from search.ab_negamax_game_tree import compute_state_score
+from search.ab_negamax_game_tree import compute_state_score, lookup_score
 from keys import STATE, ACTION, SCORE, CHILDREN, NEXT, DEPTH, TURN
 from keys import CUTOFFS, COMPUTED_NODES, SUCCESSFUL_LOOKUPS
 from math import inf
 from utils import get_opponent, score_and_distance_sym, get_pushes2
-
 
 class MyPlayer(PlayerAbalone):
     """
@@ -33,7 +32,8 @@ class MyPlayer(PlayerAbalone):
         self.heuristic = score_and_distance_sym
         self.table = {}
         self.search_depth = 3
-        self.quiescence_test = lambda x: get_pushes2(x) == 0
+        self.quiescence_search_depth = 3
+        self.use_quiescence_test = False
 
     def to_json(self):
         return ""
@@ -49,22 +49,27 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        # Play fast if quiescent state or no time left
-        if self.quiescence_test(current_state) or self.get_remaining_time() < 10:
-            depth = 2
-            quiescence_test = None
-        else:
-            depth = self.search_depth
-            quiescence_test = self.quiescence_test
-        print(quiescence_test)
-        print("Depth: ", depth)
+        # Play fast if no time left
+        if self.get_remaining_time() < 60:
+            self.search_depth = 2
+            self.use_quiescence_test = False
+
+
+        print("Depth: ", self.search_depth)
+        print("Turn", current_state.step)
+        # compute score of current state and incidentally the scores of the children
+        compute_state_score(
+            state=current_state,
+            depth = self.search_depth,
+            heuristic=self.heuristic,
+            table=self.table,
+            previous_state=current_state,
+            quiescence_search_depth=self.quiescence_search_depth,
+            quiescence_test=self.use_quiescence_test)
+
+        # if depth was sufficient, use the transposition table to get the best action
         next_action = max(
                 current_state.get_possible_actions(),
-                key=lambda x: -compute_state_score(
-                    x.get_next_game_state(),
-                    depth = depth-1,
-                    heuristic=self.heuristic,
-                    table=self.table,
-                    quiescence_test=None))
+                key=lambda x: -lookup_score(x.get_next_game_state(), -inf, self.table)[1] or -inf)
 
         return next_action
