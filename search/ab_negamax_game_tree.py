@@ -21,7 +21,7 @@ def compute_state_score(
         table,
         quiescence_test,
         previous_state,
-        quiescence_search_depth=2,
+        quiescence_search_depth=1,
         alpha=-inf,
         beta=inf):
 

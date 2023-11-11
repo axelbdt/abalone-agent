@@ -32,8 +32,8 @@ class MyPlayer(PlayerAbalone):
         self.heuristic = score_and_distance_sym
         self.table = {}
         self.search_depth = 3
-        self.quiescence_search_depth = 3
-        self.use_quiescence_test = False
+        self.quiescence_search_depth = 1
+        self.use_quiescence_test = True
 
     def to_json(self):
         return ""
@@ -54,9 +54,6 @@ class MyPlayer(PlayerAbalone):
             self.search_depth = 2
             self.use_quiescence_test = False
 
-
-        print("Depth: ", self.search_depth)
-        print("Turn", current_state.step)
         # compute score of current state and incidentally the scores of the children
         compute_state_score(
             state=current_state,
@@ -67,9 +64,9 @@ class MyPlayer(PlayerAbalone):
             quiescence_search_depth=self.quiescence_search_depth,
             quiescence_test=self.use_quiescence_test)
 
-        # if depth was sufficient, use the transposition table to get the best action
+        # use the transposition table to get the best action
         next_action = max(
                 current_state.get_possible_actions(),
-                key=lambda x: -lookup_score(x.get_next_game_state(), -inf, self.table)[1] or -inf)
+                key=lambda x: - (lookup_score(x.get_next_game_state(), -inf, self.table)[1] or inf))
 
         return next_action
