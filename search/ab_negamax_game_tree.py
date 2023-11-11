@@ -4,7 +4,7 @@ from math import inf
 import time
 
 
-def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
+def compute_state_score(state, depth, heuristic, table, quiescence_test=None, alpha=-inf, beta=inf):
     endgame = state.step + depth > state.max_step
     table_key = (state.rep, endgame)
     lookup_result = table.get(table_key)
@@ -17,13 +17,30 @@ def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
             state)
         depth = inf
     elif depth == 0:
-        # heuristic evaluates from next player (opponent) perspective
-        score = heuristic(state)
+        if quiescence_test is None or quiescence_test(state):
+            score = heuristic(state)
+        else:
+            score = compute_state_score(
+                    state,
+                    depth=1,
+                    heuristic=heuristic,
+                    table=table,
+                    quiescence_test=None,
+                    alpha=-beta,
+                    beta=-alpha)
     else:
         score = -inf
         children = sorted(
                 state.get_possible_actions(),
-                key=lambda x : compute_state_score(x.get_next_game_state(), depth=0, heuristic=heuristic, table=table, alpha=-beta, beta=-alpha),
+                key=lambda x :
+                    compute_state_score(
+                        x.get_next_game_state(),
+                        depth=0,
+                        heuristic=heuristic,
+                        table=table,
+                        quiescence_test=quiescence_test,
+                        alpha=-beta,
+                        beta=-alpha),
                 )
         for child in children:
             child_score = compute_state_score(
@@ -31,6 +48,7 @@ def compute_state_score(state, depth, heuristic, table, alpha=-inf, beta=inf):
                     depth=depth-1,
                     heuristic=heuristic,
                     table=table,
+                    quiescence_test=quiescence_test,
                     alpha=-beta,
                     beta=-alpha
                 )

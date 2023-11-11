@@ -33,6 +33,7 @@ class MyPlayer(PlayerAbalone):
         self.heuristic = score_and_distance_sym
         self.table = {}
         self.search_depth = 3
+        self.quiescence_test = lambda x: get_pushes2(x) == 0
 
     def to_json(self):
         return ""
@@ -48,15 +49,22 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        print("Get pushes: ", get_pushes2(current_state))
-        if get_pushes2(current_state) == 0:
-            depth = 1
-        elif self.get_remaining_time() < 10:
+        # Play fast if quiescent state or no time left
+        if self.quiescence_test(current_state) or self.get_remaining_time() < 10:
             depth = 2
+            quiescence_test = None
         else:
             depth = self.search_depth
+            quiescence_test = self.quiescence_test
+        print(quiescence_test)
+        print("Depth: ", depth)
         next_action = max(
                 current_state.get_possible_actions(),
-                key=lambda x: -compute_state_score(x.get_next_game_state(), depth = depth-1, heuristic=self.heuristic, table=self.table))
+                key=lambda x: -compute_state_score(
+                    x.get_next_game_state(),
+                    depth = depth-1,
+                    heuristic=self.heuristic,
+                    table=self.table,
+                    quiescence_test=None))
 
         return next_action

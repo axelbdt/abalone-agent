@@ -356,7 +356,6 @@ def get_pushes2(state):
     pushes = sum(len(set(action.get_next_game_state().get_rep().get_pieces_player(opponent)[1])
                   - opponent_positions)
                   for action in state.get_possible_actions())
-
     return pushes
 
     
