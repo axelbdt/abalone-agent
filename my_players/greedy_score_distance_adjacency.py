@@ -1,6 +1,6 @@
 from greedy import MyPlayer as MyPlayerGreedy
 from keys import STATE
-from utils import score_distance_adjacency
+from utils import heuristic_combined
 
 
 class MyPlayer(MyPlayerGreedy):
@@ -23,4 +23,9 @@ class MyPlayer(MyPlayerGreedy):
             time_limit (float, optional): the time limit in (s)
         """
         super().__init__(piece_type, name, time_limit, *args)
-        self.heuristic = lambda x: score_distance_adjacency(x[STATE])
+        self.heuristics_used = {
+            "score": 1,
+            "center": 0.5,
+            "adjacency": 0.1
+            }
+        self.heuristic = lambda x: heuristic_combined(x[STATE], self.heuristics_used)
