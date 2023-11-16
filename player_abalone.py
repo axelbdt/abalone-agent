@@ -33,29 +33,6 @@ class PlayerAbalone(Player):
         """
         super().__init__(name, *args, **kwargs)
         self.piece_type = piece_type
-        self.info = {
-            COMPUTED_NODES: 0,
-            SUCCESSFUL_LOOKUPS: 0,
-            CUTOFFS: 0
-        }
-
-    def increment_computed_nodes(self) -> None:
-        """
-        Increments the number of computed nodes by one.
-        """
-        self.info[COMPUTED_NODES] += 1
-
-    def increment_successful_lookups(self) -> None:
-        """
-        Increments the number of successful lookups by one.
-        """
-        self.info[SUCCESSFUL_LOOKUPS] += 1
-
-    def increment_cutoffs(self) -> None:
-        """
-        Increments the number of cutoffs by one.
-        """
-        self.info[CUTOFFS] += 1
 
     def get_piece_type(self) -> str:
         """

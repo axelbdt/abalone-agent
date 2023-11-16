@@ -60,19 +60,47 @@ def get_adjacency(state, player):
     """
     pieces_pos = state.get_rep().get_pieces_player(player)[1]
     neighbourhood_scores = []
-    max_piece_score = len(state.get_neighbours(pieces_pos[0][0], pieces_pos[0][1]))
+    max_piece_score = 6
     for piece in pieces_pos:
         neighbours = state.get_neighbours(piece[0], piece[1])
         piece_score = 0
         for key in neighbours:
-            # Reduce score if the marble is near an edge
-            if neighbours[key][0] == "OUTSIDE":
-                piece_score -= 1
-            # Augment score if the marble is part of a group
-            elif neighbours[key][0] == player.get_piece_type():
+            if neighbours[key][0] == player.get_piece_type():
                 piece_score += 1
         neighbourhood_scores.append(piece_score / max_piece_score)
     adjacency_score = sum(neighbourhood_scores) / len(neighbourhood_scores)
+    return adjacency_score
+
+def get_adjacency2(state, player):
+    """
+    Computes the adjacency between all the marbles for a player:
+    normalized to be lower than 1 so that score remains more important
+    return a dict with player_id as key and distance as value
+    """
+    pieces_pos = state.get_rep().get_pieces_player(player)[1]
+    neighbourhood_scores = 0
+    for piece in pieces_pos:
+        neighbours = state.get_neighbours(piece[0], piece[1])
+        neighbourhood_scores += count(
+                _ for _, neighbour in neighbours.items() if neighbour[0] == player.get_piece_type()
+        )
+    adjacency_score = neighbourhood_scores / (6 * len(pieces_pos))
+    return adjacency_score
+
+def get_adjacency2(state, player):
+    """
+    Computes the adjacency between all the marbles for a player:
+    normalized to be lower than 1 so that score remains more important
+    return a dict with player_id as key and distance as value
+    """
+    pieces_pos = state.get_rep().get_pieces_player(player)[1]
+    neighbourhood_scores = 0
+    for piece in pieces_pos:
+        neighbours = state.get_neighbours(piece[0], piece[1])
+        neighbourhood_scores += len(
+                [_ for _, neighbour in neighbours.items() if neighbour[0] == player.get_piece_type()]
+        )
+    adjacency_score = neighbourhood_scores / (6 * len(pieces_pos))
     return adjacency_score
 
 def heuristic_adjacency(state):
