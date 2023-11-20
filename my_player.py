@@ -1,3 +1,6 @@
+# Axel BAUDOT (2297081)
+# Thomas PERRIN (2229377)
+
 from player_abalone import PlayerAbalone
 from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
