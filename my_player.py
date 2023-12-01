@@ -6,8 +6,12 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from math import inf
 from statistics import fmean
+from typing import Dict, List, Tuple
 
-# constants for game tree dict keys
+
+#---------------------------- Constants for dict keys ----------------------------#
+
+# Constants for game tree dict keys
 STATE = "state"
 ACTION = "action"
 DEPTH = "depth"
@@ -19,11 +23,13 @@ NEXT = "next"
 TURN = "turn"
 PLAYER = "player"
 
-
-# constants for info dict keys
+# Constants for info dict keys
 COMPUTED_NODES = "computed_nodes"
 SUCCESSFUL_LOOKUPS = "successful_lookups"
 CUTOFFS = "cutoffs"
+
+
+#---------------------------- Utils ----------------------------#
 
 def manhattanDist(A, B):
     mask1 = [(0, 2), (1, 3), (2, 4)]
@@ -36,9 +42,18 @@ def manhattanDist(A, B):
         dist += 2
     return dist
 
-def get_opponent(state, player):
+
+#---------------------------- Heuristics ----------------------------#
+
+def get_opponent(state: GameState, player: PlayerAbalone) -> PlayerAbalone:
     """
-    Returns the opponent of the player supplied as argument
+    Returns the opponent of the player supplied as argument.
+    Args:
+        state (GameState): Current game state representation
+        player (PlayerAbalone): The player
+
+    Returns:
+        PlayerAbalone: The opponent of the player
     """
     players = state.get_players()
     opponent = (players[1] if players[0] == player
@@ -46,78 +61,18 @@ def get_opponent(state, player):
     return opponent
 
 
+# Distance to center heuristic
 
-## Score heuristic
-
-
-def compute_winner(state):
+def compute_normalized_distances_to_center(state: GameState) -> Dict[int, float]:
     """
-    Computes the winners of the game based on the scores.
+    Computes the distance to center for each player,
+    normalized to be lower than 1 so that score remains more important.
 
     Args:
-        scores (Dict[int, float]): Score for each player
-
+        state (GameState): Current game state representation
+    
     Returns:
-        Iterable[Player]: List of the players who won the game
-    """
-    scores = state.scores
-    max_val = max(scores.values())
-    players_id = list(filter(lambda key: scores[key] == max_val, scores))
-    itera = list(filter(lambda x: x.get_id()
-                 in players_id, state.get_players()))
-    if len(itera) > 1:  # égalité
-        dist = compute_distances_to_center(state)
-        min_dist = min(dist.values())
-        players_id = list(filter(lambda key: dist[key] == min_dist, dist))
-        itera = list(filter(lambda x: x.get_id()
-                     in players_id, state.get_players()))
-
-    if len(itera) > 1:
-        return None
-
-    if len(itera) == 1:
-        return itera[0]
-
-
-def compute_terminal_state_score(state):
-    """
-    Computes the score of the state for the max_player
-    """
-    winner = compute_winner(state)
-    if winner is None:
-        return 0
-    if winner.get_id() == state.get_next_player().get_id():
-        return inf
-    else:
-        return -inf
-
-
-## Distance to center heuristic
-
-
-def compute_distances_to_center(state):
-    """
-    compute the distance to center for each player
-    return a dict with player_id as key and distance as value
-    """
-    players_id = [player.get_id() for player in state.get_players()]
-    final_rep = state.get_rep()
-    env = final_rep.get_env()
-    dim = final_rep.get_dimensions()
-    dist = dict.fromkeys(players_id, 0)
-    center = (dim[0]//2, dim[1]//2)
-    for i, j in list(env.keys()):
-        p = env.get((i, j), None)
-        if p.get_owner_id():
-            dist[p.get_owner_id()] += manhattanDist(center, (i, j))
-    return dist
-
-
-def compute_normalized_distances_to_center(state):
-    """
-    compute the distance to center for each player
-    normalized to be lower than 1 so that score remains more important
-    return a dict with player_id as key and distance as value
+        Dict[int, float]: Dictionary with player_id as key and normalized distance to center as value
     """
     players_id = [player.get_id() for player in state.get_players()]
     final_rep = state.get_rep()
@@ -137,11 +92,18 @@ def compute_normalized_distances_to_center(state):
     return dist
 
 
-def get_adjacency(state, player):
+# Adjacency heuristic
+
+def get_adjacency(state: GameState, player: PlayerAbalone) -> float:
     """
-    Computes the adjacency between all the marbles for a player:
-    normalized to be lower than 1 so that score remains more important
-    return a dict with player_id as key and distance as value
+    Computes the adjacency score for the given player.
+    
+    Args:
+        state (GameState): Current game state representation
+        player (PlayerAbalone): The player
+    
+    Returns:
+        float: Normalized adjacency score
     """
     pieces_pos = state.get_rep().get_pieces_player(player)[1]
     neighbourhood_scores = [
@@ -152,9 +114,15 @@ def get_adjacency(state, player):
     adjacency_score = fmean(neighbourhood_scores) / 6
     return adjacency_score
 
-def compute_adjacency(state):
+def compute_adjacency(state: GameState) -> Dict[int, float]:
     """
-    Compute the adjacency between players' marbles
+    Computes the adjacency between marbles for both players.
+        
+    Args:
+        state (GameState): Current game state representation
+    
+    Returns:
+        Dict[int, float]: Dictionary with player_id as key and normalized adjacency as value
     """
     # Get players id
     opponent = state.get_next_player()
@@ -166,10 +134,36 @@ def compute_adjacency(state):
                         opponent_id: get_adjacency(state, opponent)}
     return adjacency_scores
 
-def score_distance_adjacency_sym(state):
+
+# Final combined heuristic (score, distance to center, adjacency)
+
+def combine_heuristics(score: Dict[int, float], dist: Dict[int, float], adjacency: Dict[int, float]) -> float:
     """
-    Combines score, distance to center and adjacency for an heuristic
-    that would give the winner of the game
+    Combines the different heuristics in a weighted manner.
+        
+    Args:
+        score (Dict[int, float]): Dictionary with player_id as key and score as value
+        dist (Dict[int, float]): Dictionary with player_id as key and normalized distance to center as value
+        adjacency (Dict[int, float]): Dictionary with player_id as key and normalized adjacency as value
+
+    Returns:
+        float: The combined heuristic
+    """
+    coeff_score = 10
+    coeff_dist = 10
+    coeff_adjacency = 1
+    return coeff_score * score - coeff_dist * dist + coeff_adjacency * adjacency
+
+def score_distance_adjacency_sym(state: GameState) -> float:
+    """
+    Combines score, distance to center and adjacency for a heuristic
+    that would give the winner of the game.
+
+    Args:
+        state (GameState): Current game state representation
+    
+    Returns:
+        float: Final heuristic
     """
     scores = state.scores
     player = state.get_next_player()
@@ -183,15 +177,87 @@ def score_distance_adjacency_sym(state):
     result = value - opponent_value
     return result
 
-def combine_heuristics(score, dist, adjacency):
-    coeff_score = 10
-    coeff_dist = 10
-    coeff_adjacency = 1
-    return coeff_score * score - coeff_dist * dist + coeff_adjacency * adjacency
 
-def push_happened(state, previous_state):
+#---------------------------- Research Strategy ----------------------------#
+
+def compute_distances_to_center(state: GameState) -> Dict[int, float]:
     """
-    Checks if a push happened between the previous state and the current state
+    Computes the distance to center for each player.
+
+    Args:
+        state (GameState): Current game state representation
+    
+    Returns:
+        Dict[int, float]: Dictionary with player_id as key and distance to center as value
+    """
+    players_id = [player.get_id() for player in state.get_players()]
+    final_rep = state.get_rep()
+    env = final_rep.get_env()
+    dim = final_rep.get_dimensions()
+    dist = dict.fromkeys(players_id, 0)
+    center = (dim[0]//2, dim[1]//2)
+    for i, j in list(env.keys()):
+        p = env.get((i, j), None)
+        if p.get_owner_id():
+            dist[p.get_owner_id()] += manhattanDist(center, (i, j))
+    return dist
+
+def compute_winner(state: GameState) -> List[PlayerAbalone]:
+    """
+    Computes the winners of the game based on the scores.
+
+    Args:
+        state (GameState): Current game state representation
+
+    Returns:
+        Iterable[PlayerAbalone]: List of the players who won the game
+    """
+    scores = state.scores
+    max_val = max(scores.values())
+    players_id = list(filter(lambda key: scores[key] == max_val, scores))
+    itera = list(filter(lambda x: x.get_id()
+                 in players_id, state.get_players()))
+    if len(itera) > 1:  # égalité
+        dist = compute_distances_to_center(state)
+        min_dist = min(dist.values())
+        players_id = list(filter(lambda key: dist[key] == min_dist, dist))
+        itera = list(filter(lambda x: x.get_id()
+                     in players_id, state.get_players()))
+
+    if len(itera) > 1:
+        return None
+
+    if len(itera) == 1:
+        return itera[0]
+
+def compute_terminal_state_score(state: GameState) -> int:
+    """
+    Computes the score of the state for the max_player.
+
+    Args:
+        state (GameState): Current game state representation
+    
+    Returns:
+        int: The score of the state for the max_player
+    """
+    winner = compute_winner(state)
+    if winner is None:
+        return 0
+    if winner.get_id() == state.get_next_player().get_id():
+        return inf
+    else:
+        return -inf
+
+def push_happened(state: GameState, previous_state: GameState) -> bool:
+    """
+    Checks if a push happened between the previous state and the current state.
+
+    Args:
+        state (GameState): Current game state representation
+        previous_state (GameState): Previous game state representation
+    
+    Returns:
+        bool: Whether a push happened or not
     """
     player = state.get_next_player()
     # Get the previous positions of the given player's pieces
@@ -201,7 +267,19 @@ def push_happened(state, previous_state):
     new_pos = state.get_rep().get_pieces_player(player)[1]
     return not (set(new_pos) == set(prev_pos))
 
-def lookup_score(state, depth, table):
+def lookup_score(state: GameState, depth: int, table: Dict) -> (Dict, float):
+    """
+    .
+
+    Args:
+        state (GameState): Current game state representation
+        depth (int): 
+        table (Dict): 
+    
+    Returns:
+        Dict: 
+        float: score
+    """
     endgame = state.step + depth > state.max_step
     table_key = (str(state.rep), endgame)
     lookup_result = table.get(table_key)
@@ -212,17 +290,31 @@ def lookup_score(state, depth, table):
 
 def compute_state_score(
         *,
-        state,
-        depth,
+        state: GameState,
+        depth: int,
         heuristic,
-        table,
-        quiescence_test,
-        previous_state,
+        table: Dict,
+        quiescence_test: bool,
+        previous_state: GameState,
         quiescence_search_depth=1,
         alpha=-inf,
-        beta=inf):
+        beta=inf) -> float:
     """
-    Computes the score of the state for using negamax with alpha-beta pruning and transposition table
+    Computes the score of the state for using negamax with alpha-beta pruning and transposition table.
+
+    Args:
+        state (GameState): Current game state representation
+        depth (int): 
+        heuristic ():
+        table (Dict): 
+        quiescence_test (bool): 
+        previous_state (GameState): Previous game state representation
+        quiescence_search_depth (int): 
+        alpha (int): Value of the best choice currently found for max player on the path from a node to the root
+        beta (int): Value of the best choice currently found for the min player on the path from a node to the root
+    
+    Returns:
+        float: score of the state
     """
 
     # Lookup in transposition table
@@ -271,7 +363,6 @@ def compute_state_score(
             if alpha >= beta:
                 break
 
-    
     # Update transposition table
     table[table_key] = {
         SCORE: score,
@@ -280,6 +371,9 @@ def compute_state_score(
     }
 
     return score
+
+
+#---------------------------- Player ----------------------------#
 
 class MyPlayer(PlayerAbalone):
     """
@@ -328,7 +422,7 @@ class MyPlayer(PlayerAbalone):
             self.search_depth = 2
             self.use_quiescence_test = False
 
-        # compute score of current state and incidentally the scores of the children
+        # Compute score of current state and incidentally the scores of the children
         compute_state_score(
             state=current_state,
             depth = self.search_depth,
@@ -338,7 +432,7 @@ class MyPlayer(PlayerAbalone):
             quiescence_search_depth=self.quiescence_search_depth,
             quiescence_test=self.use_quiescence_test)
 
-        # use the transposition table to get the best action
+        # Use the transposition table to get the best action
         next_action = max(
                 current_state.get_possible_actions(),
                 key=lambda x: - (lookup_score(x.get_next_game_state(), -inf, self.table)[1] or inf))
