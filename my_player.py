@@ -9,33 +9,21 @@ from statistics import fmean
 from typing import Dict, List, Tuple
 
 
-#---------------------------- Constants for dict keys ----------------------------#
+# ---------------------------- Constants for dict keys ----------------------------#
 
 # Constants for game tree dict keys
-STATE = "state"
-ACTION = "action"
 DEPTH = "depth"
 SCORE = "score"
-CHILDREN = "children"
-ALPHA = "alpha"
-BETA = "beta"
-NEXT = "next"
-TURN = "turn"
 PLAYER = "player"
 
-# Constants for info dict keys
-COMPUTED_NODES = "computed_nodes"
-SUCCESSFUL_LOOKUPS = "successful_lookups"
-CUTOFFS = "cutoffs"
+# ---------------------------- Utils ----------------------------#
 
-
-#---------------------------- Utils ----------------------------#
 
 def manhattanDist(A, B):
     mask1 = [(0, 2), (1, 3), (2, 4)]
     mask2 = [(0, 4)]
     diff = (abs(B[0] - A[0]), abs(B[1] - A[1]))
-    dist = (abs(B[0] - A[0]) + abs(B[1] - A[1]))/2
+    dist = (abs(B[0] - A[0]) + abs(B[1] - A[1])) / 2
     if diff in mask1:
         dist += 1
     if diff in mask2:
@@ -43,7 +31,8 @@ def manhattanDist(A, B):
     return dist
 
 
-#---------------------------- Heuristics ----------------------------#
+# ---------------------------- Heuristics ----------------------------#
+
 
 def get_opponent(state: GameState, player: PlayerAbalone) -> PlayerAbalone:
     """
@@ -56,12 +45,12 @@ def get_opponent(state: GameState, player: PlayerAbalone) -> PlayerAbalone:
         PlayerAbalone: The opponent of the player
     """
     players = state.get_players()
-    opponent = (players[1] if players[0] == player
-                else players[0])
+    opponent = players[1] if players[0] == player else players[0]
     return opponent
 
 
 # Distance to center heuristic
+
 
 def compute_normalized_distances_to_center(state: GameState) -> Dict[int, float]:
     """
@@ -70,7 +59,7 @@ def compute_normalized_distances_to_center(state: GameState) -> Dict[int, float]
 
     Args:
         state (GameState): Current game state representation
-    
+
     Returns:
         Dict[int, float]: Dictionary with player_id as key and normalized distance to center as value
     """
@@ -80,7 +69,7 @@ def compute_normalized_distances_to_center(state: GameState) -> Dict[int, float]
     dim = final_rep.get_dimensions()
     dist = dict.fromkeys(players_id, 0)
     pieces = dict.fromkeys(players_id, 0)
-    center = (dim[0]//2, dim[1]//2)
+    center = (dim[0] // 2, dim[1] // 2)
     for i, j in list(env.keys()):
         p = env.get((i, j), None)
         if p.get_owner_id():
@@ -94,33 +83,40 @@ def compute_normalized_distances_to_center(state: GameState) -> Dict[int, float]
 
 # Adjacency heuristic
 
+
 def get_adjacency(state: GameState, player: PlayerAbalone) -> float:
     """
     Computes the adjacency score for the given player.
-    
+
     Args:
         state (GameState): Current game state representation
         player (PlayerAbalone): The player
-    
+
     Returns:
         float: Normalized adjacency score
     """
     pieces_pos = state.get_rep().get_pieces_player(player)[1]
     neighbourhood_scores = [
-        len([_ for _, neighbour in state.get_neighbours(piece[0], piece[1]).items() 
-             if neighbour[0] == player.get_piece_type()])
+        len(
+            [
+                _
+                for _, neighbour in state.get_neighbours(piece[0], piece[1]).items()
+                if neighbour[0] == player.get_piece_type()
+            ]
+        )
         for piece in pieces_pos
     ]
     adjacency_score = fmean(neighbourhood_scores) / 6
     return adjacency_score
 
+
 def compute_adjacency(state: GameState) -> Dict[int, float]:
     """
     Computes the adjacency between marbles for both players.
-        
+
     Args:
         state (GameState): Current game state representation
-    
+
     Returns:
         Dict[int, float]: Dictionary with player_id as key and normalized adjacency as value
     """
@@ -130,17 +126,22 @@ def compute_adjacency(state: GameState) -> Dict[int, float]:
     player = get_opponent(state, opponent)
     player_id = player.get_id()
 
-    adjacency_scores = {player_id: get_adjacency(state, player),
-                        opponent_id: get_adjacency(state, opponent)}
+    adjacency_scores = {
+        player_id: get_adjacency(state, player),
+        opponent_id: get_adjacency(state, opponent),
+    }
     return adjacency_scores
 
 
 # Final combined heuristic (score, distance to center, adjacency)
 
-def combine_heuristics(score: Dict[int, float], dist: Dict[int, float], adjacency: Dict[int, float]) -> float:
+
+def combine_heuristics(
+    score: Dict[int, float], dist: Dict[int, float], adjacency: Dict[int, float]
+) -> float:
     """
     Combines the different heuristics in a weighted manner.
-        
+
     Args:
         score (Dict[int, float]): Dictionary with player_id as key and score as value
         dist (Dict[int, float]): Dictionary with player_id as key and normalized distance to center as value
@@ -154,6 +155,7 @@ def combine_heuristics(score: Dict[int, float], dist: Dict[int, float], adjacenc
     coeff_adjacency = 1
     return coeff_score * score - coeff_dist * dist + coeff_adjacency * adjacency
 
+
 def score_distance_adjacency_sym(state: GameState) -> float:
     """
     Combines score, distance to center and adjacency for a heuristic
@@ -161,7 +163,7 @@ def score_distance_adjacency_sym(state: GameState) -> float:
 
     Args:
         state (GameState): Current game state representation
-    
+
     Returns:
         float: Final heuristic
     """
@@ -173,12 +175,15 @@ def score_distance_adjacency_sym(state: GameState) -> float:
     dist = compute_normalized_distances_to_center(state)
     adjacency = compute_adjacency(state)
     value = combine_heuristics(scores[player_id], dist[player_id], adjacency[player_id])
-    opponent_value = combine_heuristics(scores[opponent_id], dist[opponent_id], adjacency[opponent_id])
+    opponent_value = combine_heuristics(
+        scores[opponent_id], dist[opponent_id], adjacency[opponent_id]
+    )
     result = value - opponent_value
     return result
 
 
-#---------------------------- Research Strategy ----------------------------#
+# ---------------------------- Research Strategy ----------------------------#
+
 
 def compute_distances_to_center(state: GameState) -> Dict[int, float]:
     """
@@ -186,7 +191,7 @@ def compute_distances_to_center(state: GameState) -> Dict[int, float]:
 
     Args:
         state (GameState): Current game state representation
-    
+
     Returns:
         Dict[int, float]: Dictionary with player_id as key and distance to center as value
     """
@@ -195,12 +200,13 @@ def compute_distances_to_center(state: GameState) -> Dict[int, float]:
     env = final_rep.get_env()
     dim = final_rep.get_dimensions()
     dist = dict.fromkeys(players_id, 0)
-    center = (dim[0]//2, dim[1]//2)
+    center = (dim[0] // 2, dim[1] // 2)
     for i, j in list(env.keys()):
         p = env.get((i, j), None)
         if p.get_owner_id():
             dist[p.get_owner_id()] += manhattanDist(center, (i, j))
     return dist
+
 
 def compute_winner(state: GameState) -> List[PlayerAbalone]:
     """
@@ -215,14 +221,12 @@ def compute_winner(state: GameState) -> List[PlayerAbalone]:
     scores = state.scores
     max_val = max(scores.values())
     players_id = list(filter(lambda key: scores[key] == max_val, scores))
-    itera = list(filter(lambda x: x.get_id()
-                 in players_id, state.get_players()))
+    itera = list(filter(lambda x: x.get_id() in players_id, state.get_players()))
     if len(itera) > 1:  # égalité
         dist = compute_distances_to_center(state)
         min_dist = min(dist.values())
         players_id = list(filter(lambda key: dist[key] == min_dist, dist))
-        itera = list(filter(lambda x: x.get_id()
-                     in players_id, state.get_players()))
+        itera = list(filter(lambda x: x.get_id() in players_id, state.get_players()))
 
     if len(itera) > 1:
         return None
@@ -230,13 +234,14 @@ def compute_winner(state: GameState) -> List[PlayerAbalone]:
     if len(itera) == 1:
         return itera[0]
 
+
 def compute_terminal_state_score(state: GameState) -> int:
     """
     Computes the score of the state for the max_player.
 
     Args:
         state (GameState): Current game state representation
-    
+
     Returns:
         int: The score of the state for the max_player
     """
@@ -248,6 +253,7 @@ def compute_terminal_state_score(state: GameState) -> int:
     else:
         return -inf
 
+
 def push_happened(state: GameState, previous_state: GameState) -> bool:
     """
     Checks if a push happened between the previous state and the current state.
@@ -255,7 +261,7 @@ def push_happened(state: GameState, previous_state: GameState) -> bool:
     Args:
         state (GameState): Current game state representation
         previous_state (GameState): Previous game state representation
-    
+
     Returns:
         bool: Whether a push happened or not
     """
@@ -267,52 +273,59 @@ def push_happened(state: GameState, previous_state: GameState) -> bool:
     new_pos = state.get_rep().get_pieces_player(player)[1]
     return not (set(new_pos) == set(prev_pos))
 
-def lookup_score(state: GameState, depth: int, table: Dict) -> (Dict, float):
+
+def lookup_score(state: GameState, depth: int, table: Dict) -> ((str, bool), float):
     """
-    .
+    Looks up the score of the state in the transposition table.
 
     Args:
         state (GameState): Current game state representation
-        depth (int): 
-        table (Dict): 
-    
+        depth (int): Depth of the search
+        table (Dict): Transposition table
+
     Returns:
-        Dict: 
+        (srt, bool): key used for lookup (state representation, end of game is near)
         float: score
     """
     endgame = state.step + depth > state.max_step
     table_key = (str(state.rep), endgame)
     lookup_result = table.get(table_key)
     if lookup_result is not None and lookup_result[DEPTH] >= depth:
-        score = lookup_result[SCORE] if lookup_result[PLAYER] == state.get_next_player() else -lookup_result[SCORE]
+        score = (
+            lookup_result[SCORE]
+            if lookup_result[PLAYER] == state.get_next_player()
+            else -lookup_result[SCORE]
+        )
         return table_key, score
     return table_key, None
 
+
 def compute_state_score(
-        *,
-        state: GameState,
-        depth: int,
-        heuristic,
-        table: Dict,
-        quiescence_test: bool,
-        previous_state: GameState,
-        quiescence_search_depth=1,
-        alpha=-inf,
-        beta=inf) -> float:
+    *,
+    state: GameState,
+    depth: int,
+    heuristic,
+    table: Dict,
+    quiescence_test: bool,
+    previous_state: GameState,
+    quiescence_search_depth=1,
+    alpha=-inf,
+    beta=inf
+) -> float:
     """
-    Computes the score of the state for using negamax with alpha-beta pruning and transposition table.
+    Computes the score of the state for using negamax with alpha-beta pruning and transposition table, fills transposition table
 
     Args:
         state (GameState): Current game state representation
-        depth (int): 
-        heuristic ():
-        table (Dict): 
-        quiescence_test (bool): 
+        depth (int): Depth of the search
+        heuristic (function): Heuristic function
+        table (Dict): Transposition table
+        quiescence_test (bool): Whether to use quiescence search or not
         previous_state (GameState): Previous game state representation
-        quiescence_search_depth (int): 
+        quiescence_search_depth (int): Depth of the quiescence search
         alpha (int): Value of the best choice currently found for max player on the path from a node to the root
         beta (int): Value of the best choice currently found for the min player on the path from a node to the root
-    
+
     Returns:
         float: score of the state
     """
@@ -323,23 +336,23 @@ def compute_state_score(
         score = lookup_result
     elif state.is_done():
         # Terminal state
-        score = compute_terminal_state_score(
-            state)
+        score = compute_terminal_state_score(state)
         depth = inf
     elif depth == 0:
         # Non-terminal state at max depth
         # use quiescence search if a piece was just pushed
         if quiescence_test and push_happened(state, previous_state):
             score = compute_state_score(
-                    state=state,
-                    depth=quiescence_search_depth,
-                    heuristic=heuristic,
-                    table=table,
-                    previous_state=previous_state,
-                    quiescence_test=False,
-                    quiescence_search_depth=quiescence_search_depth,
-                    alpha=-beta,
-                    beta=-alpha)
+                state=state,
+                depth=quiescence_search_depth,
+                heuristic=heuristic,
+                table=table,
+                previous_state=previous_state,
+                quiescence_test=False,
+                quiescence_search_depth=quiescence_search_depth,
+                alpha=-beta,
+                beta=-alpha,
+            )
         else:
             score = heuristic(state)
     else:
@@ -348,32 +361,29 @@ def compute_state_score(
         children = state.get_possible_actions()
         for child in children:
             child_score = compute_state_score(
-                    state=child.get_next_game_state(),
-                    depth=depth-1,
-                    heuristic=heuristic,
-                    table=table,
-                    previous_state=state,
-                    quiescence_test=quiescence_test,
-                    quiescence_search_depth=quiescence_search_depth,
-                    alpha=-beta,
-                    beta=-alpha
-                )
+                state=child.get_next_game_state(),
+                depth=depth - 1,
+                heuristic=heuristic,
+                table=table,
+                previous_state=state,
+                quiescence_test=quiescence_test,
+                quiescence_search_depth=quiescence_search_depth,
+                alpha=-beta,
+                beta=-alpha,
+            )
             score = max(score, -child_score)
             alpha = max(alpha, score)
             if alpha >= beta:
                 break
 
     # Update transposition table
-    table[table_key] = {
-        SCORE: score,
-        DEPTH: depth,
-        PLAYER: state.get_next_player()
-    }
+    table[table_key] = {SCORE: score, DEPTH: depth, PLAYER: state.get_next_player()}
 
     return score
 
 
-#---------------------------- Player ----------------------------#
+# ---------------------------- Player ----------------------------#
+
 
 class MyPlayer(PlayerAbalone):
     """
@@ -385,7 +395,9 @@ class MyPlayer(PlayerAbalone):
         piece_type (str): piece type of the player
     """
 
-    def __init__(self, piece_type: str, name: str = "bob", time_limit: float = 60*15, *args) -> None:
+    def __init__(
+        self, piece_type: str, name: str = "bob", time_limit: float = 60 * 15, *args
+    ) -> None:
         """
         Initialize the PlayerAbalone instance.
 
@@ -396,7 +408,6 @@ class MyPlayer(PlayerAbalone):
         """
         super().__init__(piece_type, name, time_limit, *args)
         self.game_tree = None
-        self.computed_nodes = 0
         self.heuristic = score_distance_adjacency_sym
         self.table = {}
         self.search_depth = 3
@@ -425,16 +436,20 @@ class MyPlayer(PlayerAbalone):
         # Compute score of current state and incidentally the scores of the children
         compute_state_score(
             state=current_state,
-            depth = self.search_depth,
+            depth=self.search_depth,
             heuristic=self.heuristic,
             table=self.table,
             previous_state=current_state,
             quiescence_search_depth=self.quiescence_search_depth,
-            quiescence_test=self.use_quiescence_test)
+            quiescence_test=self.use_quiescence_test,
+        )
 
         # Use the transposition table to get the best action
         next_action = max(
-                current_state.get_possible_actions(),
-                key=lambda x: - (lookup_score(x.get_next_game_state(), -inf, self.table)[1] or inf))
+            current_state.get_possible_actions(),
+            key=lambda x: -(
+                lookup_score(x.get_next_game_state(), -inf, self.table)[1] or inf
+            ),
+        )
 
         return next_action
