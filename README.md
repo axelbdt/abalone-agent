@@ -7,14 +7,13 @@ Algorithms implemented:
 - [x] Minimax
 - [x] AB pruning
 - [x] AB pruning with nodes sorted by heuristic
-- [ ] AB pruning with Transposition Table
-- [ ] AB pruning with Iterative Deepening (and TT)
+- [x] AB pruning with Transposition Table
 
 Heuristics available:
 
 - [x] Distance to center of the board
 - [x] Ejected pieces with distance as a tie-breaker
-- [ ] Maximise push and ejections available
+- [x] Maximise push and ejections available
 
 ## Run the agents
 
